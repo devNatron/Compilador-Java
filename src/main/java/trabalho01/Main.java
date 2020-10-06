@@ -1,4 +1,7 @@
-import AST.*; import java.io.*;
+package trabalho01;
+
+import AST.*; 
+import java.io.*;
 
 public class Main {
     public static void main( String []args ) {
@@ -55,7 +58,7 @@ public class Main {
             program = null;
             // the generated code goes to a file and so are the errors
             try {
-                program = compiler.compile(input, printWriter );
+                program = compiler.compile(input, printWriter);
             } catch ( RuntimeException e ) {
                 System.out.println(e);
             }
