@@ -12,8 +12,18 @@ import java.util.ArrayList;
  * @author super
  */
 public class Program {
-    
-    public Program (){
 
+    private ArrayList<Func> arrayFunc;
+
+    public Program(ArrayList<Func> arrayFunc) {
+        this.arrayFunc = arrayFunc;
+    }
+
+    public void genC() {
+        // System.out.println("#include <stdio.h>\n");
+        // if (arrayFunc != null) {
+        // for (Func f : arrayFunc)
+        // f.genC();
+        // }
     }
 }

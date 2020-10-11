@@ -8,6 +8,7 @@ abstract public class Type {
     public Type( String name ) {
         this.name = name;
     }
+    
     public static Type booleanType = new BooleanType();
     public static Type intType = new IntType();
     public static Type StringType = new StringType();

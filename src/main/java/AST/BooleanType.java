@@ -6,6 +6,6 @@ public class BooleanType extends Type {
     }
     /*
     public String getCname() {
-        return "int";
+        return "boolean";
     }*/
 }
