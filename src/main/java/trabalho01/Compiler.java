@@ -1,6 +1,7 @@
 package trabalho01;
 
 import AST.*;
+import Lexer.*;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -10,11 +11,13 @@ public class Compiler {
     private char token;
     private int tokenPos;
     private char input[];
+    private Lexer lexer;
 
     public Program compile(char m_input[], PrintWriter PW) {
         input = m_input;
         tokenPos = 0;
-        nextToken();
+        lexer = new Lexer(input);
+        lexer.nextToken();
 
         // symbolTable = new Hashtable();
 
@@ -25,13 +28,14 @@ public class Compiler {
         return p;
     }
 
+    //Program ::= Func { Func }
     private Program program() {
         // ArrayList<variable> esq = varDecList();
 
         // Expr dir = null;
 
         if (token == ':') {
-            nextToken();
+            lexer.nextToken();
             // dir = expr();
         } else
             error();
@@ -140,7 +144,7 @@ public class Compiler {
     }
 
     // ParamDec ::= Type Id
-    private void paramDec(ParamList paramList) {
+    private void ParamDec(ParamList paramList) {
         Parameter v;
         Type typeVar = type();
         v.setType(typeVar);
@@ -162,6 +166,7 @@ public class Compiler {
         paramList.add(v);
     }
 
+    //Type ::= "int" | "boolean" | "String"
     private Type type() {
         Type result;
         switch (lexer.token) {
@@ -183,7 +188,7 @@ public class Compiler {
     }
 
     // StatList ::= { Stat }
-    private StatList statementList() {
+    private StatList StatList() {
         Symbol s;
         Stat stat;
         ArrayList<Stat> v = new ArrayList<Stat>();
@@ -203,7 +208,7 @@ public class Compiler {
     }
 
     // Stat ::= AssignExprStat | ReturnStat | VarDecStat | IfStat | WhileStat
-    private Stat statement() {
+    private Stat Stat() {
         switch (lexer.token) {
             case IDENT:
                 if (symbolTable.get(lexer.getStringValue()) instanceof Func)
@@ -224,7 +229,8 @@ public class Compiler {
         }
     }
 
-    private IfStat ifStat() {
+    //IfStat ::= "if" Expr "then" StatList [ "else" StatList ] "endif"
+    private IfStat IfStat() {
         lexer.nextToken();
         Expr e = expr();
         // semantic analysis
@@ -250,7 +256,8 @@ public class Compiler {
         return new IfStat(e, thenPart, elsePart);
     }
 
-    private Stat whileStat() {
+    //WhileStat ::= "while" Expr "do" StatList "endw"
+    private Stat WhileStat() {
         lexer.nextToken();
 
         Expr expr = expr();
@@ -265,7 +272,8 @@ public class Compiler {
         return new WhileStat(expr, statement());
     }
 
-    private ReturnStat returnStat() {
+    //ReturnStat ::= "return" Expr ";"
+    private ReturnStat ReturnStat() {
         lexer.nextToken();
         Expr e = expr();
         // // semantic analysis
@@ -277,7 +285,8 @@ public class Compiler {
         return new ReturnStat(e);
     }
 
-    private VarDecStat varDecStat() {
+    //VarDecStat ::= "var" Type Id ";"
+    private VarDecStat VarDecStat() {
         lexer.nextToken();
         Type typeVar = type();
 
@@ -297,7 +306,7 @@ public class Compiler {
     }
 
     //FuncCall ::= Id "(" [ Expr { "," Expr } ] ")"
-    private FuncCall functionCall() {
+    private FuncCall FuncCall() {
         ExprList anExprList = null; //não faço ideia do q seja
         String name = (String) lexer.getStringValue();
         lexer.nextToken();
@@ -325,20 +334,6 @@ public class Compiler {
             lexer.nextToken();
         }
         return new FuncCall(p, anExprList);
-    }
-
-    // Analisador lÃ©xico
-    private void nextToken() {
-        while (tokenPos < input.length && input[tokenPos] == ' ') {
-            tokenPos++;
-        }
-
-        if (tokenPos >= input.length)
-            token = '\0';
-        else {
-            token = input[tokenPos];
-            tokenPos++;
-        }
     }
 
     public void error() {

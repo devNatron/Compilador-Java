@@ -14,7 +14,7 @@ import java.util.Hashtable;
 public class Lexer {
     
     static private Hashtable<String, Symbol> keywordsTable;
-    private Symbol token;
+    public Symbol token;
     private String stringValue;
     private int numberValue;
     private int tokenPos;
@@ -34,8 +34,9 @@ public class Lexer {
         keywordsTable.put("end", Symbol.END);
     }
     
-    public Lexer(char input[], CompilerError error){
-    
+    //CompilerError error
+    public Lexer(char input[]){
+        this.input = input;
     }
     
     public void nextToken(){

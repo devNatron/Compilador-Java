@@ -36,7 +36,9 @@ public enum Symbol {
     ENDIF("endif"),
     COMMA(","),
     READ("read"),
-    WRITE("write");
+    WRITE("write"),
+    AND("&&"),
+    OR("||");
         
     public String nome;
     
