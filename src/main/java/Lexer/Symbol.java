@@ -43,7 +43,8 @@ public enum Symbol {
     WHILE("while"),
     INTEGER("integer"),
     BOOLEAN("boolean"),
-    STRING("string");
+    STRING("string"),
+    COLON(":");
         
     public String nome;
     

@@ -7,22 +7,17 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 
 public class Compiler {
-
-    private char token;
-    private int tokenPos;
-    private char input[];
+    
     private Lexer lexer;
 
     public Program compile(char m_input[], PrintWriter PW) {
-        input = m_input;
-        tokenPos = 0;
-        lexer = new Lexer(input);
+        lexer = new Lexer(m_input);
         lexer.nextToken();
 
         // symbolTable = new Hashtable();
 
         Program p = program();
-        if (tokenPos != input.length)
+        if (lexer.tokenPos != lexer.input.length)
             error();
 
         return p;
@@ -34,7 +29,7 @@ public class Compiler {
 
         // Expr dir = null;
 
-        if (token == ':') {
+        if (lexer.token == Symbol.COLON) {
             lexer.nextToken();
             // dir = expr();
         } else
@@ -163,7 +158,7 @@ public class Compiler {
         v = new Param(name);
 
         symbolTable.putInLocal(name, v);
-        paramList.add(v);
+        paramList.addElement(v);
     }
 
     //Type ::= "int" | "boolean" | "String"
@@ -337,12 +332,12 @@ public class Compiler {
     }
 
     public void error() {
-        if (tokenPos == 0)
-            tokenPos = 1;
-        else if (tokenPos >= input.length)
-            tokenPos = input.length;
+        if (lexer.tokenPos == 0)
+            lexer.tokenPos = 1;
+        else if (lexer.tokenPos >= lexer.input.length)
+            lexer.tokenPos = lexer.input.length;
 
-        String stInput = new String(input, tokenPos - 1, input.length - tokenPos + 1);
+        String stInput = new String(lexer.input, lexer.tokenPos - 1, lexer.input.length - lexer.tokenPos + 1);
         String stError = "Error at \"" + stInput + "\"";
         System.out.println(stError);
         throw new RuntimeException(stError);

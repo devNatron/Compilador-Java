@@ -17,8 +17,8 @@ public class Lexer {
     public Symbol token;
     private String stringValue;
     private int numberValue;
-    private int tokenPos;
-    private char input [];
+    public int tokenPos;
+    public char input [];
     private int lineNumber;
     
     static{
@@ -37,6 +37,7 @@ public class Lexer {
     //CompilerError error
     public Lexer(char input[]){
         this.input = input;
+        tokenPos = 0;
     }
     
     public void nextToken(){
