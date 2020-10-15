@@ -5,13 +5,13 @@ import java.util.*;
 
 public class ParamList {
 
-    ArrayList<Type> v;
+    ArrayList<Param> v;
 
     public ParamList() {
-        v = new ArrayList<Type>();
+        v = new ArrayList<Param>();
     }
 
-    public void addElement(Type parameter) {
+    public void addElement(Param parameter) {
         v.add(parameter);
     }
 
@@ -23,7 +23,7 @@ public class ParamList {
         return v.elements();
     }
 
-    public ArrayList<Type> getParamList() {
+    public ArrayList<Param> getParamList() {
         return v;
     }
 

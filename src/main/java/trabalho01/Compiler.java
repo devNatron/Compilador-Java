@@ -134,10 +134,10 @@ public class Compiler {
         ParamList paramList = null;
         if (lexer.token == Symbol.IDENT) {
             paramList = new ParamList();
-            paramDec(paramList);
+            ParamDec(paramList);
             while (lexer.token == Symbol.COMMA) {
                 lexer.nextToken();
-                paramDec(paramList);
+                ParamDec(paramList);
             }
         }
         return paramList;
@@ -145,7 +145,7 @@ public class Compiler {
 
     // ParamDec ::= Type Id
     private void ParamDec(ParamList paramList) {
-        Parameter v;
+        Param v;
         Type typeVar = type();
         v.setType(typeVar);
 
@@ -160,7 +160,7 @@ public class Compiler {
         // if (symbolTable.getInLocal(name) != null)
         // error.show("Parameter " + name + " has already been declared");
 
-        v = new Parameter(name);
+        v = new Param(name);
 
         symbolTable.putInLocal(name, v);
         paramList.add(v);
@@ -170,14 +170,14 @@ public class Compiler {
     private Type type() {
         Type result;
         switch (lexer.token) {
-            case INT:
+            case INTEGER:
                 result = Type.intType;
                 break;
             case BOOLEAN:
                 result = Type.booleanType;
                 break;
-            case CHAR:
-                result = Type.charType;
+            case STRING:
+                result = Type.StringType;
                 break;
             default:
                 error.show("Type expected");
@@ -193,7 +193,7 @@ public class Compiler {
         Stat stat;
         ArrayList<Stat> v = new ArrayList<Stat>();
         while ((s = lexer.token) != Symbol.ELSE && s != Symbol.ENDIF && s != Symbol.ENDW) {
-            stat = statement();
+            stat = Stat();
 
             if (stat != null) {
                 v.add(stat);
@@ -216,13 +216,13 @@ public class Compiler {
                 else
                     return assignExprStat();
             case RETURN:
-                return returnStat();
+                return ReturnStat();
             case VAR:
-                return varDecStat();
+                return VarDecStat();
             case IF:
-                return ifStat();
+                return IfStat();
             case WHILE:
-                return whileStat();
+                return WhileStat();
             default:
                 error.show("Statement expected");
                 // throw new StatementException();
@@ -242,12 +242,12 @@ public class Compiler {
             error.signal("then expected");
 
         lexer.nextToken();
-        StatList thenPart = statementList();
+        StatList thenPart = StatList();
         StatList elsePart = null;
 
         if (lexer.token == Symbol.ELSE) {
             lexer.nextToken();
-            elsePart = statementList();
+            elsePart = StatList();
         }
         if (lexer.token != Symbol.ENDIF)
             error.signal("\"endif\" expected");
@@ -269,7 +269,7 @@ public class Compiler {
         else
             lexer.nextToken();
 
-        return new WhileStat(expr, statement());
+        return new WhileStat(expr, Stat());
     }
 
     //ReturnStat ::= "return" Expr ";"

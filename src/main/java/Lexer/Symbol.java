@@ -38,7 +38,12 @@ public enum Symbol {
     READ("read"),
     WRITE("write"),
     AND("&&"),
-    OR("||");
+    OR("||"),
+    RETURN("return"),
+    WHILE("while"),
+    INTEGER("integer"),
+    BOOLEAN("boolean"),
+    STRING("string");
         
     public String nome;
     
