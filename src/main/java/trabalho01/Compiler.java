@@ -13,16 +13,26 @@ public class Compiler {
     private CompilerError error;
 
     public Program compile(char m_input[], PrintWriter PW) {
-        lexer = new Lexer(m_input);
+
+        error = new CompilerError( lexer, new PrintWriter(PW) );
+        lexer = new Lexer(m_input, error);
+        symbolTable = new Hashtable();
+        error.setLexer(lexer);
+        
         lexer.nextToken();
 
-        // symbolTable = new Hashtable();
-
-        Program p = program();
-        if (lexer.tokenPos != lexer.input.length)
-            error();
-
-        return p;
+        Program p = null;
+        
+        try{
+            p = program();
+        } catch (Expception e){
+            e.printStackTrace();
+        }
+        
+        if ( error.wasAnErrorSignalled() )
+            return null;
+         else
+            return p;
     }
 
     //Program ::= Func { Func }
@@ -266,7 +276,14 @@ public class Compiler {
         else
             lexer.nextToken();
 
-        return new WhileStat(expr, Stat());
+        return new WhileStat(expr, stat());
+    }
+    
+    private boolean checkWhileExpr( Type exprType ) {
+        if ( exprType == Type.undefinedType || exprType == Type.booleanType )
+            return true;
+        else
+            return false;
     }
 
     //ReturnStat ::= "return" Expr ";"

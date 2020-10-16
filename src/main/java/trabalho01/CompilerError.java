@@ -13,6 +13,12 @@ public class CompilerError {
     public CompilerError( PrintWriter out ) {
         this.out = out;
     }
+    
+    public CompilerError(Lexer lexer, PrintWriter out ) {
+        this.out = out;
+        this.lexer = lexer;
+    }
+    
     public void setLexer( Lexer lexer ) {
         this.lexer = lexer;
     }
@@ -35,6 +41,10 @@ public class CompilerError {
         if ( out.checkError() )
             System.out.println("Error in signaling an error");
         thereWasAnError = true;
+    }
+    
+    public boolean wasAnErrorSignalled() {
+        return thereWasAnError;
     }
     
     public void signal( String strMessage ) {

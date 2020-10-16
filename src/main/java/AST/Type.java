@@ -12,6 +12,7 @@ abstract public class Type {
     public static Type booleanType = new BooleanType();
     public static Type intType = new IntType();
     public static Type StringType = new StringType();
+    public static Type undefinedType = new UndefinedType();
     
     public String getName() {
         return name;

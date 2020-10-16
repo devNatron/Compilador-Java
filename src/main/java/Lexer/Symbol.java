@@ -48,7 +48,13 @@ public enum Symbol {
     READINT("readInt"),
     READSTRING("readString"),
     PRINT("print"),
-    PRINTLN("println");
+    PRINTLN("println"),
+    ENDW("endw"),
+    DO("do"),
+    CURLYLEFTBRACE("{"),
+    CURLYRIGHTBRACE("}"),
+    LEFTSQBRACKET("["),
+    RIGHTSQBRACKET("]");
         
     public String nome;
     
