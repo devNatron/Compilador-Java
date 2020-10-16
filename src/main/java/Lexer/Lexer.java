@@ -32,6 +32,10 @@ public class Lexer {
         keywordsTable.put("write", Symbol.WRITE);
         keywordsTable.put("begin", Symbol.BEGIN);
         keywordsTable.put("end", Symbol.END);
+        keywordsTable.put("readInt", Symbol.READINT);
+        keywordsTable.put("readString", Symbol.READSTRING);
+        keywordsTable.put("print", Symbol.PRINT);
+        keywordsTable.put("println", Symbol.PRINTLN);
     }
     
     //CompilerError error

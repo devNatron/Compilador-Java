@@ -44,7 +44,11 @@ public enum Symbol {
     INTEGER("integer"),
     BOOLEAN("boolean"),
     STRING("string"),
-    COLON(":");
+    COLON(":"),
+    READINT("readInt"),
+    READSTRING("readString"),
+    PRINT("print"),
+    PRINTLN("println");
         
     public String nome;
     
