@@ -9,6 +9,8 @@ import java.util.Hashtable;
 public class Compiler {
     
     private Lexer lexer;
+    private Hashtable<String, Variable> symbolTable;
+    private CompilerError error;
 
     public Program compile(char m_input[], PrintWriter PW) {
         lexer = new Lexer(m_input);
@@ -188,7 +190,7 @@ public class Compiler {
         Stat stat;
         ArrayList<Stat> v = new ArrayList<Stat>();
         while ((s = lexer.token) != Symbol.ELSE && s != Symbol.ENDIF && s != Symbol.ENDW) {
-            stat = Stat();
+            stat = stat();
 
             if (stat != null) {
                 v.add(stat);
@@ -330,17 +332,4 @@ public class Compiler {
         }
         return new FuncCall(p, anExprList);
     }
-
-    public void error() {
-        if (lexer.tokenPos == 0)
-            lexer.tokenPos = 1;
-        else if (lexer.tokenPos >= lexer.input.length)
-            lexer.tokenPos = lexer.input.length;
-
-        String stInput = new String(lexer.input, lexer.tokenPos - 1, lexer.input.length - lexer.tokenPos + 1);
-        String stError = "Error at \"" + stInput + "\"";
-        System.out.println(stError);
-        throw new RuntimeException(stError);
-    }
-
 }

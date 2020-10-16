@@ -6,6 +6,7 @@
 package Lexer;
 
 import java.util.Hashtable;
+import trabalho01.*;
 
 /**
  *
@@ -38,7 +39,8 @@ public class Lexer {
         keywordsTable.put("println", Symbol.PRINTLN);
     }
     
-    //CompilerError error
+    CompilerError error;
+    
     public Lexer(char input[]){
         this.input = input;
         tokenPos = 0;
@@ -130,7 +132,7 @@ public class Lexer {
                         token = Symbol.NEQ;
                         tokenPos++;
                     }else
-                        error("falta =");
+                        error.show("falta =");
                 break;
                 case '=':
                     if(input[tokenPos+1] == '='){
@@ -152,7 +154,7 @@ public class Lexer {
                     token = Symbol.SEMICOLON;
                 break;
                 default:
-                    error("inválido na gramática");
+                    error.show("inválido na gramática");
                 break;
             }
             tokenPos++;
