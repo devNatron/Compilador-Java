@@ -11,14 +11,19 @@ public class FuncCall extends Expr {
         this.exprList = exprList;
     }
 
-    public void genC(PW pw, boolean putParenthesis) {
+    //public void genC(PW pw, boolean putParenthesis) {
         // pw.out.print( function.getName() + "(" );
         // if ( exprList != null )
         // exprList.genC(pw);
         // pw.out.print( ")");
-    }
+    //}
 
     public Type getType() {
         return function.getReturnType();
+    }
+
+    @Override
+    public void genC(PW pw) {
+        
     }
 }

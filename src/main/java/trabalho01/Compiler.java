@@ -42,10 +42,10 @@ public class Compiler {
     // Expr ::= ExprAnd { "||" ExprAnd }
     private Expr expr() {
         Expr left, right;
-        left = ExprAnd();
+        left = exprAnd();
         if (lexer.token == Symbol.OR) {
             lexer.nextToken();
-            right = ExprAnd();
+            right = exprAnd();
             // // semantic analysis
             // if (left.getType() != Type.booleanType || right.getType() !=
             // Type.booleanType)
@@ -56,12 +56,12 @@ public class Compiler {
     }
 
     // ExprAnd ::= ExprRel { "&&" ExprRel }
-    private Expr ExprAnd() {
+    private Expr exprAnd() {
         Expr left, right;
-        left = ExprRel();
+        left = exprRel();
         if (lexer.token == Symbol.AND) {
             lexer.nextToken();
-            right = ExprRel();
+            right = exprRel();
             // // semantic analysis
             // if (left.getType() != Type.booleanType || right.getType() !=
             // Type.booleanType)
@@ -72,15 +72,15 @@ public class Compiler {
     }
 
     // ExprRel ::= ExprAdd [ RelOp ExprAdd ]
-    private Expr ExprRel() {
+    private Expr exprRel() {
         Expr left, right;
-        left = ExprAdd();
+        left = exprAdd();
 
         Symbol op = lexer.token;
         if (op == Symbol.EQ || op == Symbol.NEQ || op == Symbol.LE || op == Symbol.LT || op == Symbol.GE
                 || op == Symbol.GT) {
             lexer.nextToken();
-            right = ExprAdd();
+            right = exprAdd();
 
             // // semantic analysis
             // if (left.getType() != right.getType())
@@ -92,13 +92,13 @@ public class Compiler {
     }
 
     // ExprAdd ::= ExprMult { ( "+" | "-" ) ExprMult }
-    private Expr ExprAdd() {
+    private Expr exprAdd() {
         Symbol op;
         Expr left, right;
-        left = ExprMult();
+        left = exprMult();
         while ((op = lexer.token) == Symbol.PLUS || op == Symbol.MINUS) {
             lexer.nextToken();
-            right = ExprMult();
+            right = exprMult();
 
             // // semantic analysis
             // if (left.getType() != right.getType())
@@ -109,13 +109,13 @@ public class Compiler {
     }
 
     // ExprMult ::= ExprUnary { ( "*" | "/" ) ExprUnary }
-    private Expr ExprMult() {
+    private Expr exprMult() {
         Expr left, right;
-        left = ExprUnary();
+        left = exprUnary();
         Symbol op;
         while ((op = lexer.token) == Symbol.MULT || op == Symbol.DIV) {
             lexer.nextToken();
-            right = ExprUnary();
+            right = exprUnary();
             // semantic analysis
             if (left.getType() != Type.intType || right.getType() != Type.intType)
                 error.signal("Expression of type integer expected");
@@ -129,17 +129,17 @@ public class Compiler {
         ParamList paramList = null;
         if (lexer.token == Symbol.IDENT) {
             paramList = new ParamList();
-            ParamDec(paramList);
+            paramDec(paramList);
             while (lexer.token == Symbol.COMMA) {
                 lexer.nextToken();
-                ParamDec(paramList);
+                paramDec(paramList);
             }
         }
         return paramList;
     }
 
     // ParamDec ::= Type Id
-    private void ParamDec(ParamList paramList) {
+    private void paramDec(ParamList paramList) {
         Param v;
         Type typeVar = type();
         v.setType(typeVar);
@@ -183,7 +183,7 @@ public class Compiler {
     }
 
     // StatList ::= { Stat }
-    private StatList StatList() {
+    private StatList statList() {
         Symbol s;
         Stat stat;
         ArrayList<Stat> v = new ArrayList<Stat>();
@@ -203,7 +203,7 @@ public class Compiler {
     }
 
     // Stat ::= AssignExprStat | ReturnStat | VarDecStat | IfStat | WhileStat
-    private Stat Stat() {
+    private Stat stat() {
         switch (lexer.token) {
             case IDENT:
                 if (symbolTable.get(lexer.getStringValue()) instanceof Func)
@@ -211,13 +211,13 @@ public class Compiler {
                 else
                     return assignExprStat();
             case RETURN:
-                return ReturnStat();
+                return returnStat();
             case VAR:
-                return VarDecStat();
+                return varDecStat();
             case IF:
-                return IfStat();
+                return ifStat();
             case WHILE:
-                return WhileStat();
+                return whileStat();
             default:
                 error.show("Statement expected");
                 // throw new StatementException();
@@ -225,7 +225,7 @@ public class Compiler {
     }
 
     //IfStat ::= "if" Expr "then" StatList [ "else" StatList ] "endif"
-    private IfStat IfStat() {
+    private IfStat ifStat() {
         lexer.nextToken();
         Expr e = expr();
         // semantic analysis
@@ -237,12 +237,12 @@ public class Compiler {
             error.signal("then expected");
 
         lexer.nextToken();
-        StatList thenPart = StatList();
+        StatList thenPart = statList();
         StatList elsePart = null;
 
         if (lexer.token == Symbol.ELSE) {
             lexer.nextToken();
-            elsePart = StatList();
+            elsePart = statList();
         }
         if (lexer.token != Symbol.ENDIF)
             error.signal("\"endif\" expected");
@@ -252,7 +252,7 @@ public class Compiler {
     }
 
     //WhileStat ::= "while" Expr "do" StatList "endw"
-    private Stat WhileStat() {
+    private Stat whileStat() {
         lexer.nextToken();
 
         Expr expr = expr();
@@ -268,7 +268,7 @@ public class Compiler {
     }
 
     //ReturnStat ::= "return" Expr ";"
-    private ReturnStat ReturnStat() {
+    private ReturnStat returnStat() {
         lexer.nextToken();
         Expr e = expr();
         // // semantic analysis
@@ -281,7 +281,7 @@ public class Compiler {
     }
 
     //VarDecStat ::= "var" Type Id ";"
-    private VarDecStat VarDecStat() {
+    private VarDecStat varDecStat() {
         lexer.nextToken();
         Type typeVar = type();
 
@@ -301,7 +301,7 @@ public class Compiler {
     }
 
     //FuncCall ::= Id "(" [ Expr { "," Expr } ] ")"
-    private FuncCall FuncCall() {
+    private FuncCall funcCall() {
         ExprList anExprList = null; //não faço ideia do q seja
         String name = (String) lexer.getStringValue();
         lexer.nextToken();

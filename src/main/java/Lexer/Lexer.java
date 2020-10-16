@@ -89,8 +89,8 @@ public class Lexer {
             
             numberValue = Integer.parseInt(buffer);
             
-            if(numberValue > MaxValueInteger)
-                error("overflow int");
+            //if(numberValue > MaxValueInteger)
+                //error("overflow int");
             
             token = Symbol.NUMBER;
         } else {
