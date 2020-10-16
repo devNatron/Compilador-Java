@@ -34,6 +34,28 @@ public class Func {
         this.statList = statList;
     }
 
+    public int readInt(){
+        Scanner in = new Scanner(System.in);
+        int num = in.nextInt();
+        in.close();
+        return num;
+    }
+
+    public String readString(){
+        Scanner in = new Scanner(System.in);
+        String string = in.nextLine();
+        in.close();
+        return string;
+    }
+
+    public void print(String expr){
+        System.out.print(expr);
+    }
+
+    public void println(Int expr){
+        System.out.println(expr);
+    }
+
     public void genC(PW pw) {
         // pw.out.print("def " + name + "(");
         // if (paramList != null)
