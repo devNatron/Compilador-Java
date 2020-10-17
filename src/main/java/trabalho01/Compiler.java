@@ -21,13 +21,7 @@ public class Compiler {
         
         lexer.nextToken();
 
-        Program p = null;
-        
-        try{
-            p = program();
-        } catch (Expception e){
-            e.printStackTrace();
-        }
+        Program p = program();
         
         if ( error.wasAnErrorSignalled() )
             return null;
@@ -45,7 +39,8 @@ public class Compiler {
             lexer.nextToken();
             // dir = expr();
         } else
-            error.show();
+            error.show("");
+            //consertar acima
 
         // return new Program(esq, dir);
         return null;
@@ -135,7 +130,36 @@ public class Compiler {
         }
         return left;
     }
-
+    
+    //ExprUnary ::= [ ( "+" | "-" ) ] ExprPrimary
+    private Expr exprUnary() {
+        Expr left, right;
+        left = exprPrimary();
+        //todo
+        return left;
+    }
+    //ExprPrimary ::= Id | FuncCall | ExprLiteral
+    private Expr exprPrimary() {
+        Expr left, right;
+        left = exprLiteral();
+        //todo
+        return left;
+    }
+    
+    //ExprLiteral ::= LiteralInt | LiteralBoolean | LiteralString
+    private Expr exprLiteral() {
+        Expr left, right;
+        left = literalBoolean();
+        //todo
+        return left;
+    }
+    
+    //LiteralBoolean ::= "true" | "false"
+    private Expr literalBoolean() {
+        //todo
+        return null;
+    }
+    
     // ParamList ::= ParamDec { "," ParamDec }
     private ParamList paramList() {
         ParamList paramList = null;
@@ -152,7 +176,8 @@ public class Compiler {
 
     // ParamDec ::= Type Id
     private void paramDec(ParamList paramList) {
-        Param v;
+        //todo
+        Param v = new Param("a");
         Type typeVar = type();
         v.setType(typeVar);
 
@@ -169,7 +194,7 @@ public class Compiler {
 
         v = new Param(name);
 
-        symbolTable.putInLocal(name, v);
+        //symbolTable.putInLocal(name, v);
         paramList.addElement(v);
     }
 
@@ -218,9 +243,9 @@ public class Compiler {
     private Stat stat() {
         switch (lexer.token) {
             case IDENT:
-                if (symbolTable.get(lexer.getStringValue()) instanceof Func)
-                    return funcCall();
-                else
+                //if (symbolTable.get(lexer.getStringValue()) instanceof Func)
+                    //return funcCall();
+                //else
                     return assignExprStat();
             case RETURN:
                 return returnStat();
@@ -234,6 +259,7 @@ public class Compiler {
                 error.show("Statement expected");
                 // throw new StatementException();
         }
+        return null;
     }
 
     //AssignExprStat ::= Expr [ "=" Expr ] ";"
@@ -254,7 +280,8 @@ public class Compiler {
         if ( lexer.token != Symbol.ASSIGN )
             error.show("= expected");
         lexer.nextToken();
-        return new AssignExprStat( v, expr() );
+        //return new AssignExprStat( v, expr() );
+        return null;
     }
     
     //IfStat ::= "if" Expr "then" StatList [ "else" StatList ] "endif"
@@ -333,9 +360,11 @@ public class Compiler {
         VarDecStat v = new VarDecStat(typeVar, name);
 
         // // semantic analysis
+        /*
         if (symbolTable.putInLocal(name, v) != null) {
             error.show("Variable " + name + " has already been declared");
         }
+        */
 
         return v;
     }
@@ -345,7 +374,7 @@ public class Compiler {
         ExprList anExprList = null; //não faço ideia do q seja
         String name = (String) lexer.getStringValue();
         lexer.nextToken();
-        Func p = (Func) symbolTable.getInGlobal(name);
+        //Func p = (Func) symbolTable.getInGlobal(name);
 
         if (lexer.token != Symbol.LEFTPAR) {
             error.show("( expected");
@@ -356,7 +385,7 @@ public class Compiler {
         if (lexer.token != Symbol.RIGHTPAR) {
             // The parameter list is used to check if the arguments to the
             // procedure have the correct types
-            anExprList = exprList(p.getParamList());
+            //anExprList = exprList(p.getParamList());
             if (lexer.token != Symbol.RIGHTPAR)
                 error.show("Error in expression");
             else
@@ -364,10 +393,13 @@ public class Compiler {
         } else {
             // semantic analysis
             // does the procedure has no parameter ?
+            /*
             if (p.getParamList() != null && p.getParamList().getSize() != 0)
                 error.show("Parameter expected");
+            */
             lexer.nextToken();
         }
-        return new FuncCall(p, anExprList);
+        //return new FuncCall(p, anExprList);
+        return null;
     }
 }

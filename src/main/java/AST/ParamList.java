@@ -20,7 +20,8 @@ public class ParamList {
     }
 
     public Enumeration elements() {
-        return v.elements();
+        Enumeration e = Collections.enumeration(v);
+        return e;
     }
 
     public ArrayList<Param> getParamList() {
