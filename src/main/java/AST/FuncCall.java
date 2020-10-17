@@ -6,7 +6,7 @@ public class FuncCall extends Expr {
     Func function;
     ExprList exprList;
 
-    public FunctionCall( Func function, ExprList exprList ) {
+    public FuncCall( Func function, ExprList exprList ) {
         this.function = function;
         this.exprList = exprList;
     }

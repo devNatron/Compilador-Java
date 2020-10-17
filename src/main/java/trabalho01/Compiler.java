@@ -45,7 +45,7 @@ public class Compiler {
             lexer.nextToken();
             // dir = expr();
         } else
-            error();
+            error.show();
 
         // return new Program(esq, dir);
         return null;
@@ -219,7 +219,7 @@ public class Compiler {
         switch (lexer.token) {
             case IDENT:
                 if (symbolTable.get(lexer.getStringValue()) instanceof Func)
-                    return functionCall();
+                    return funcCall();
                 else
                     return assignExprStat();
             case RETURN:
@@ -236,6 +236,27 @@ public class Compiler {
         }
     }
 
+    //AssignExprStat ::= Expr [ "=" Expr ] ";"
+    private AssignExprStat assignExprStat() {
+        // the current token is Symbol.IDENT and stringValue
+        // contains the identifier
+        String name = lexer.getStringValue();
+        // is the variable in the symbol table ? Variables are inserted in the
+        // symbol table when they are declared. If the variable is not there, it has
+        // not been declared.
+        Variable v = (Variable ) symbolTable.get(name);
+        // was it in the symbol table ?
+        if ( v == null )
+            error.show("Variable " + name + " was not declared");
+
+        // eat token Symbol.IDENT
+        lexer.nextToken();
+        if ( lexer.token != Symbol.ASSIGN )
+            error.show("= expected");
+        lexer.nextToken();
+        return new AssignExprStat( v, expr() );
+    }
+    
     //IfStat ::= "if" Expr "then" StatList [ "else" StatList ] "endif"
     private IfStat ifStat() {
         lexer.nextToken();
