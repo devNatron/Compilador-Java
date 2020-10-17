@@ -4,6 +4,9 @@ import Lexer.*;
 import java.io.*;
 
 public class CompositeExpr extends Expr {
+    private Expr left, right;
+    private Symbol oper;
+    
     public CompositeExpr(Expr pleft, Symbol poper, Expr pright) {
         left = pleft;
         oper = poper;
@@ -24,7 +27,4 @@ public class CompositeExpr extends Expr {
         else
             return Type.intType;
     }
-
-    private Expr left, right;
-    private Symbol oper;
 }

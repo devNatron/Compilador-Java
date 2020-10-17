@@ -5,11 +5,11 @@ import java.io.*;
 public class WhileStat extends Stat {
 
     private Expr expr;
-    private Stat statement;
+    private StatList sl;
 
-    public WhileStat(Expr expr, Stat statement) {
+    public WhileStat(Expr expr, StatList sl) {
         this.expr = expr;
-        this.statement = statement;
+        this.sl = sl;
     }
 
     public void genC(PW pw) {

@@ -31,34 +31,76 @@ public class Compiler {
 
     //Program ::= Func { Func }
     private Program program() {
-        // ArrayList<variable> esq = varDecList();
+        ArrayList<Func> funcs = new ArrayList<>();
+        
+        funcs.add(func());
+        
+        while(lexer.token != Symbol.EOF){
+            funcs.add(func());
+        }
 
-        // Expr dir = null;
-
-        if (lexer.token == Symbol.COLON) {
-            lexer.nextToken();
-            // dir = expr();
-        } else
-            error.show("");
-            //consertar acima
-
-        // return new Program(esq, dir);
-        return null;
+        return new Program(funcs);
     }
 
+    // Func ::= "def" Id [ "(" ParamList ")" ] [ ":" Type ] "{" StatList "}"
+    private Func func(){
+        Func f = null;
+        System.out.println(lexer.token);
+        if(lexer.token == Symbol.DEF){
+            lexer.nextToken();
+            if(lexer.token == Symbol.IDENT){
+                f = new Func(lexer.getStringValue());
+                lexer.nextToken();
+                
+                if(lexer.token == Symbol.LEFTPAR){
+                    lexer.nextToken();
+                    ParamList pl = paramList();
+
+                    if(lexer.token == Symbol.RIGHTPAR){
+                        lexer.nextToken();
+                        f.setParamList(pl);
+                    }else
+                        error.show(") esperado");
+                }
+
+                if(lexer.token == Symbol.COLON){
+                    lexer.nextToken();
+                    Type t = type();
+                    f.setReturnType(t);
+                }
+                
+                if(lexer.token == Symbol.CURLYLEFTBRACE){
+                    lexer.nextToken();
+                    StatList st = statList();
+                    if(lexer.token == Symbol.CURLYRIGHTBRACE){
+                        lexer.nextToken();
+                        f.setStatList(st);
+                    }else
+                        error.show("} esperado");
+                }else
+                    error.show("{ esperado");
+            }else
+                error.show("id esperado");
+        }else
+            error.show("def esperado");
+        lexer.nextToken();
+        return f;
+    }
+    
     // Expr ::= ExprAnd { "||" ExprAnd }
     private Expr expr() {
         Expr left, right;
         left = exprAnd();
-        if (lexer.token == Symbol.OR) {
+        
+        while(lexer.token == Symbol.OR){
             lexer.nextToken();
             right = exprAnd();
+            left = new CompositeExpr(left, Symbol.OR, right);
+        }
             // // semantic analysis
             // if (left.getType() != Type.booleanType || right.getType() !=
             // Type.booleanType)
-            // error.signal("Expression of boolean type expected");
-            left = new CompositeExpr(left, Symbol.OR, right);
-        }
+            // error.signal("Expression of boolean type expected");;
         return left;
     }
 
@@ -66,14 +108,15 @@ public class Compiler {
     private Expr exprAnd() {
         Expr left, right;
         left = exprRel();
-        if (lexer.token == Symbol.AND) {
+        
+        while (lexer.token == Symbol.AND) {
             lexer.nextToken();
             right = exprRel();
+            left = new CompositeExpr(left, Symbol.AND, right);
             // // semantic analysis
             // if (left.getType() != Type.booleanType || right.getType() !=
             // Type.booleanType)
             // error.signal("Expression of boolean type expected");
-            left = new CompositeExpr(left, Symbol.AND, right);
         }
         return left;
     }
@@ -103,6 +146,7 @@ public class Compiler {
         Symbol op;
         Expr left, right;
         left = exprMult();
+        
         while ((op = lexer.token) == Symbol.PLUS || op == Symbol.MINUS) {
             lexer.nextToken();
             right = exprMult();
@@ -124,8 +168,8 @@ public class Compiler {
             lexer.nextToken();
             right = exprUnary();
             // semantic analysis
-            if (left.getType() != Type.intType || right.getType() != Type.intType)
-                error.signal("Expression of type integer expected");
+            //if (left.getType() != Type.intType || right.getType() != Type.intType)
+                //error.signal("Expression of type integer expected");
             left = new CompositeExpr(left, op, right);
         }
         return left;
@@ -133,69 +177,81 @@ public class Compiler {
     
     //ExprUnary ::= [ ( "+" | "-" ) ] ExprPrimary
     private Expr exprUnary() {
-        Expr left, right;
-        left = exprPrimary();
-        //todo
-        return left;
+        Symbol op;
+        if((op = lexer.token) == Symbol.PLUS || op == Symbol.MINUS){
+            lexer.nextToken();
+        } 
+        return exprPrimary();
     }
+    
     //ExprPrimary ::= Id | FuncCall | ExprLiteral
     private Expr exprPrimary() {
-        Expr left, right;
-        left = exprLiteral();
-        //todo
-        return left;
+        Expr e = null;
+        if(lexer.token == Symbol.IDENT){
+            String name = (String) lexer.getStringValue();
+            lexer.nextToken();
+            System.out.println(lexer.token);
+            if(lexer.token == Symbol.LEFTPAR){
+                lexer.nextToken();
+                e = funcCall(name);
+            }else{
+                //lexer.nextToken();
+                e = expr();
+            }
+        }else
+            e = exprLiteral();
+        
+        return e;
     }
     
     //ExprLiteral ::= LiteralInt | LiteralBoolean | LiteralString
     private Expr exprLiteral() {
-        Expr left, right;
-        left = literalBoolean();
-        //todo
-        return left;
-    }
-    
-    //LiteralBoolean ::= "true" | "false"
-    private Expr literalBoolean() {
-        //todo
-        return null;
+        Expr e = null;
+        if(lexer.token == Symbol.LITERALINT){
+            e = new ExprLiteral(new IntType());
+        }else if(lexer.token == Symbol.LITERALSTRING){
+            e = new ExprLiteral(new StringType());
+        }else if (lexer.token == Symbol.LITERALBOOLEAN){
+            e = new ExprLiteral(new BooleanType());
+        }else{
+            error.show("literal errado");
+        }
+        lexer.nextToken();
+        return e;
     }
     
     // ParamList ::= ParamDec { "," ParamDec }
     private ParamList paramList() {
-        ParamList paramList = null;
-        if (lexer.token == Symbol.IDENT) {
-            paramList = new ParamList();
+        ParamList paramList = new ParamList();
+        paramDec(paramList);
+        
+        while (lexer.token == Symbol.COMMA) {
+            lexer.nextToken();
             paramDec(paramList);
-            while (lexer.token == Symbol.COMMA) {
-                lexer.nextToken();
-                paramDec(paramList);
-            }
         }
+        
         return paramList;
     }
 
     // ParamDec ::= Type Id
     private void paramDec(ParamList paramList) {
-        //todo
-        Param v = new Param("a");
+        Param v = null;
         Type typeVar = type();
-        v.setType(typeVar);
-
-        lexer.nextToken(); // não sei precisa
 
         if (lexer.token != Symbol.IDENT)
-            error.signal("Identifier expected");
+            error.show("Id esperado");
+        
         String name = (String) lexer.getStringValue();
-        lexer.nextToken();
-
+        v = new Param(name);
+        v.setType(typeVar);
+        
         // // semantic analysis
         // if (symbolTable.getInLocal(name) != null)
         // error.show("Parameter " + name + " has already been declared");
 
-        v = new Param(name);
-
         //symbolTable.putInLocal(name, v);
         paramList.addElement(v);
+        lexer.nextToken();
     }
 
     //Type ::= "int" | "boolean" | "String"
@@ -212,8 +268,8 @@ public class Compiler {
                 result = Type.StringType;
                 break;
             default:
-                error.show("Type expected");
-                result = Type.intType;
+                error.show("Type esperado");
+                result = Type.undefinedType;
         }
         lexer.nextToken();
         return result;
@@ -221,32 +277,26 @@ public class Compiler {
 
     // StatList ::= { Stat }
     private StatList statList() {
+        ArrayList<Stat> v = new ArrayList<Stat>();
+        
         Symbol s;
         Stat stat;
-        ArrayList<Stat> v = new ArrayList<Stat>();
-        while ((s = lexer.token) != Symbol.ELSE && s != Symbol.ENDIF && s != Symbol.ENDW) {
+        //while ((s = lexer.token) != Symbol.ELSE && s != Symbol.ENDIF && s != Symbol.ENDW) {
+        while ((s = lexer.token) == Symbol.IF || s == Symbol.WHILE || s == Symbol.IDENT || s == Symbol.RETURN || s == Symbol.VAR) {
             stat = stat();
 
             if (stat != null) {
                 v.add(stat);
-                if (lexer.token != Symbol.SEMICOLON) {
-                    error.show("; expected", true);
-                    lexer.skipPunctuation();
-                } else
-                    lexer.nextToken();
+                //lexer.nextToken();
             }
         }
+        System.out.println("final " + lexer.token);
         return new StatList(v);
     }
 
     // Stat ::= AssignExprStat | ReturnStat | VarDecStat | IfStat | WhileStat
     private Stat stat() {
         switch (lexer.token) {
-            case IDENT:
-                //if (symbolTable.get(lexer.getStringValue()) instanceof Func)
-                    //return funcCall();
-                //else
-                    return assignExprStat();
             case RETURN:
                 return returnStat();
             case VAR:
@@ -255,46 +305,41 @@ public class Compiler {
                 return ifStat();
             case WHILE:
                 return whileStat();
+            case IDENT:
+                return assignExprStat();
             default:
-                error.show("Statement expected");
-                // throw new StatementException();
+                error.show("stat errado");
+                return null;
         }
-        return null;
     }
 
     //AssignExprStat ::= Expr [ "=" Expr ] ";"
     private AssignExprStat assignExprStat() {
-        // the current token is Symbol.IDENT and stringValue
-        // contains the identifier
-        String name = lexer.getStringValue();
-        // is the variable in the symbol table ? Variables are inserted in the
-        // symbol table when they are declared. If the variable is not there, it has
-        // not been declared.
-        Variable v = (Variable ) symbolTable.get(name);
-        // was it in the symbol table ?
-        if ( v == null )
-            error.show("Variable " + name + " was not declared");
-
-        // eat token Symbol.IDENT
-        lexer.nextToken();
-        if ( lexer.token != Symbol.ASSIGN )
-            error.show("= expected");
-        lexer.nextToken();
-        //return new AssignExprStat( v, expr() );
-        return null;
+        Expr left = expr();
+        Expr right = null;
+        
+        if ( lexer.token == Symbol.ASSIGN ){
+            lexer.nextToken();
+            right = expr();
+        }
+        
+        if (lexer.token != Symbol.SEMICOLON)
+            error.show("; esperado");
+        else
+            lexer.nextToken();
+        
+        return new AssignExprStat( left, right );
     }
     
     //IfStat ::= "if" Expr "then" StatList [ "else" StatList ] "endif"
     private IfStat ifStat() {
         lexer.nextToken();
         Expr e = expr();
-        // semantic analysis
-        // check if expression has type boolean
-        if (e.getType() != Type.booleanType)
-            error.signal("Boolean type expected in if expression");
+       // if (e.getType() != Type.booleanType)
+            //error.signal("Boolean type expected in if expression");
 
         if (lexer.token != Symbol.THEN)
-            error.signal("then expected");
+            error.show("then esperado");
 
         lexer.nextToken();
         StatList thenPart = statList();
@@ -305,7 +350,9 @@ public class Compiler {
             elsePart = statList();
         }
         if (lexer.token != Symbol.ENDIF)
-            error.signal("\"endif\" expected");
+            error.show("\"endif\" esperado");
+        else
+            System.out.println("endif achado");
 
         lexer.nextToken();
         return new IfStat(e, thenPart, elsePart);
@@ -317,21 +364,21 @@ public class Compiler {
 
         Expr expr = expr();
 
-        if (!checkWhileExpr(expr.getType()))
-            error.show("Boolean expression expected");
+        //if (!checkWhileExpr(expr.getType()))
+           // error.show("Boolean expression expected");
         if (lexer.token != Symbol.DO)
-            error.show("do expected");
-        else
-            lexer.nextToken();
+            error.show("do esperado");
+        
+        lexer.nextToken();
+        
+        StatList doPart = statList();
+        
+        if (lexer.token != Symbol.ENDW)
+            error.show("\"endw\" esperado");
+        
+        lexer.nextToken();
 
-        return new WhileStat(expr, stat());
-    }
-    
-    private boolean checkWhileExpr( Type exprType ) {
-        if ( exprType == Type.undefinedType || exprType == Type.booleanType )
-            return true;
-        else
-            return false;
+        return new WhileStat(expr, doPart);
     }
 
     //ReturnStat ::= "return" Expr ";"
@@ -339,25 +386,28 @@ public class Compiler {
         lexer.nextToken();
         Expr e = expr();
         // // semantic analysis
-        // // Are we inside a function ?
         // if (currentFunction == null)
         // error.show("return statement inside a procedure");
         // else if (!checkAssignment(currentFunction.getReturnType(), e.getType()))
         // error.show("Return type does not match function type");
+        if (lexer.token != Symbol.SEMICOLON)
+            error.show("; esperado");
+        
+        lexer.nextToken();
+        
         return new ReturnStat(e);
     }
 
     //VarDecStat ::= "var" Type Id ";"
     private VarDecStat varDecStat() {
         lexer.nextToken();
+
         Type typeVar = type();
 
         if (lexer.token != Symbol.IDENT)
-            error.signal("Identifier expected");
+            error.show("id esperado");
         String name = (String) lexer.getStringValue();
         lexer.nextToken();
-
-        VarDecStat v = new VarDecStat(typeVar, name);
 
         // // semantic analysis
         /*
@@ -365,30 +415,39 @@ public class Compiler {
             error.show("Variable " + name + " has already been declared");
         }
         */
+        
+        if (lexer.token != Symbol.SEMICOLON)
+            error.show("; esperado");
+        
+        lexer.nextToken();
+        
+        VarDecStat v = new VarDecStat(typeVar, name);
 
         return v;
     }
 
     //FuncCall ::= Id "(" [ Expr { "," Expr } ] ")"
-    private FuncCall funcCall() {
-        ExprList anExprList = null; //não faço ideia do q seja
-        String name = (String) lexer.getStringValue();
-        lexer.nextToken();
+    private FuncCall funcCall(String id) {
+        
+        ExprList anExprList = null;
+        Func f = new Func(id);
         //Func p = (Func) symbolTable.getInGlobal(name);
-
-        if (lexer.token != Symbol.LEFTPAR) {
-            error.show("( expected");
-            lexer.skipBraces();
-        } else
-            lexer.nextToken();
 
         if (lexer.token != Symbol.RIGHTPAR) {
             // The parameter list is used to check if the arguments to the
             // procedure have the correct types
-            //anExprList = exprList(p.getParamList());
-            if (lexer.token != Symbol.RIGHTPAR)
-                error.show("Error in expression");
-            else
+            anExprList = new ExprList();
+            
+            anExprList.addElement(expr());
+            
+            while(lexer.token == Symbol.COMMA){
+                lexer.nextToken();
+                anExprList.addElement(expr());
+            }
+            
+            if (lexer.token != Symbol.RIGHTPAR){
+                error.show(") faltando");
+            }else
                 lexer.nextToken();
         } else {
             // semantic analysis
@@ -399,7 +458,6 @@ public class Compiler {
             */
             lexer.nextToken();
         }
-        //return new FuncCall(p, anExprList);
-        return null;
+        return new FuncCall(f, anExprList);
     }
 }

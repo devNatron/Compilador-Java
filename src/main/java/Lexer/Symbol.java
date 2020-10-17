@@ -54,7 +54,13 @@ public enum Symbol {
     CURLYLEFTBRACE("{"),
     CURLYRIGHTBRACE("}"),
     LEFTSQBRACKET("["),
-    RIGHTSQBRACKET("]");
+    RIGHTSQBRACKET("]"),
+    DEF("def"),
+    TRUE("true"),
+    FALSE("false"),
+    LITERALINT("literalInt"),
+    LITERALSTRING("literalstring"),
+    LITERALBOOLEAN("literalboolean");
         
     public String nome;
     

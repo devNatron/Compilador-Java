@@ -27,10 +27,12 @@ public class Lexer {
     static{
         keywordsTable = new Hashtable<String, Symbol>();
         keywordsTable.put("var", Symbol.VAR);
+        keywordsTable.put("def", Symbol.DEF);
         keywordsTable.put("if", Symbol.IF);
         keywordsTable.put("else", Symbol.ELSE);
         keywordsTable.put("then", Symbol.THEN);
         keywordsTable.put("endif", Symbol.ENDIF);
+        keywordsTable.put("endw", Symbol.ENDW);
         keywordsTable.put("read", Symbol.READ);
         keywordsTable.put("write", Symbol.WRITE);
         keywordsTable.put("begin", Symbol.BEGIN);
@@ -39,6 +41,9 @@ public class Lexer {
         keywordsTable.put("readString", Symbol.READSTRING);
         keywordsTable.put("print", Symbol.PRINT);
         keywordsTable.put("println", Symbol.PRINTLN);
+        keywordsTable.put("int", Symbol.INTEGER);
+        keywordsTable.put("boolean", Symbol.BOOLEAN);
+        keywordsTable.put("String", Symbol.STRING);
     }
     
     CompilerError error;
@@ -75,6 +80,10 @@ public class Lexer {
     
     public String getStringValue() {
         return stringValue;
+    }
+    
+    public int getNumberValue() {
+        return numberValue;
     }
     
     private String getLine( int index ) {
@@ -129,13 +138,13 @@ public class Lexer {
                 if(input[tokenPos] == '\n')
                     lineNumber++;
                     
-                tokenPos++;
+                    tokenPos++;
 		}
 		
 		if(tokenPos >= input.length - 1){
-            token = Symbol.EOF;
-			return;
-        }
+                    token = Symbol.EOF;
+                    return;
+                }
                 
         if(input[tokenPos] == '/' && input[tokenPos+1] == '/'){
             while(tokenPos < input.length && input[tokenPos] != '\n'){
@@ -150,17 +159,20 @@ public class Lexer {
         }
                 
         String buffer = "";
-        
+
         if(Character.isLetter(input[tokenPos])){
             while(Character.isLetter(input[tokenPos])){
                 buffer += input[tokenPos];
                 tokenPos++;
             }
-            
+
             if(buffer != ""){
                 token = keywordsTable.get(buffer);
                 if(token == null){
-                    token = Symbol.IDENT;
+                    if(buffer == "true" || buffer == "false")
+                        token = Symbol.LITERALBOOLEAN;
+                    else
+                        token = Symbol.IDENT;
                     stringValue = buffer;
                 }
             }
@@ -172,10 +184,20 @@ public class Lexer {
             
             numberValue = Integer.parseInt(buffer);
             
-            //if(numberValue > MaxValueInteger)
-                //error("overflow int");
+            if(numberValue > 2147483647 || numberValue < 0)
+                error.show("overflow int");
             
-            token = Symbol.NUMBER;
+            token = Symbol.LITERALINT;
+        } else if(input[tokenPos] == '"'){
+            tokenPos++;
+
+            while(input[tokenPos] != '"'){
+                buffer += input[tokenPos];
+                tokenPos++;
+            }
+            token = Symbol.LITERALSTRING;
+            tokenPos++;
+            stringValue = buffer;
         } else {
             switch(input[tokenPos]){
                 case '+':
@@ -229,6 +251,28 @@ public class Lexer {
                 break;
                 case ';':
                     token = Symbol.SEMICOLON;
+                break;
+                case '{':
+                    token = Symbol.CURLYLEFTBRACE;
+                break;
+                case '}':
+                    token = Symbol.CURLYRIGHTBRACE;
+                break;
+                case '[':
+                    token = Symbol.LEFTSQBRACKET;
+                break;
+                case ']':
+                    token = Symbol.RIGHTSQBRACKET;
+                break;
+                case ':':
+                    token = Symbol.COLON;
+                break;
+                case '|':
+                    if(input[tokenPos+1] == '|'){
+                        token = Symbol.OR;
+                        tokenPos++;
+                    }else
+                        error.show("inválido na gramática");
                 break;
                 default:
                     error.show("inválido na gramática");
