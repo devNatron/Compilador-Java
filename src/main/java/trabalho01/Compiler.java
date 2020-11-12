@@ -4,7 +4,7 @@
     Victor Fernandes de Oliveira Brayner    RA: 743600
 */
 
-package F01_Jose_Marcus_Victor;
+package trabalho01;
 
 import AST.*;
 import Lexer.*;
@@ -42,7 +42,11 @@ public class Compiler {
         funcs.add(func());
         
         while(lexer.token != Symbol.EOF){
-            funcs.add(func());
+            Func f = func();
+            if(f != null)
+                funcs.add(f);
+            else
+                break;
         }
 
         return new Program(funcs);
@@ -51,7 +55,7 @@ public class Compiler {
     // Func ::= "def" Id [ "(" ParamList ")" ] [ ":" Type ] "{" StatList "}"
     private Func func(){
         Func f = null;
-        System.out.println(lexer.token);
+
         if(lexer.token == Symbol.DEF){
             lexer.nextToken();
             if(lexer.token == Symbol.IDENT){
@@ -89,7 +93,8 @@ public class Compiler {
                 error.show("id esperado");
         }else
             error.show("def esperado");
-        lexer.nextToken();
+        //Por algum motivo, este nextToken evita loop eterno
+        //lexer.nextToken();
         return f;
     }
     
@@ -196,12 +201,14 @@ public class Compiler {
         if(lexer.token == Symbol.IDENT){
             String name = (String) lexer.getStringValue();
             lexer.nextToken();
-            System.out.println(lexer.token);
+
             if(lexer.token == Symbol.LEFTPAR){
                 lexer.nextToken();
                 e = funcCall(name);
             }else{
                 //lexer.nextToken();
+                //trocar pra variableExpr()
+                //ver composite expr (a + b e etc)
                 e = expr();
             }
         }else
@@ -220,6 +227,7 @@ public class Compiler {
         }else if (lexer.token == Symbol.LITERALBOOLEAN){
             e = new ExprLiteral(new BooleanType());
         }else{
+            System.out.println("Token: ");
             error.show("literal errado");
         }
         lexer.nextToken();
@@ -296,7 +304,6 @@ public class Compiler {
                 //lexer.nextToken();
             }
         }
-        System.out.println("final " + lexer.token);
         return new StatList(v);
     }
 
@@ -357,8 +364,6 @@ public class Compiler {
         }
         if (lexer.token != Symbol.ENDIF)
             error.show("\"endif\" esperado");
-        else
-            System.out.println("endif achado");
 
         lexer.nextToken();
         return new IfStat(e, thenPart, elsePart);

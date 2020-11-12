@@ -30,6 +30,8 @@ public class Lexer {
         keywordsTable.put("else", Symbol.ELSE);
         keywordsTable.put("then", Symbol.THEN);
         keywordsTable.put("endif", Symbol.ENDIF);
+        keywordsTable.put("while", Symbol.WHILE);
+        keywordsTable.put("do", Symbol.DO);
         keywordsTable.put("endw", Symbol.ENDW);
         keywordsTable.put("read", Symbol.READ);
         keywordsTable.put("write", Symbol.WRITE);
@@ -42,6 +44,7 @@ public class Lexer {
         keywordsTable.put("int", Symbol.INTEGER);
         keywordsTable.put("boolean", Symbol.BOOLEAN);
         keywordsTable.put("String", Symbol.STRING);
+        keywordsTable.put("return", Symbol.RETURN);
     }
     
     CompilerError error;
@@ -136,14 +139,14 @@ public class Lexer {
                 if(input[tokenPos] == '\n')
                     lineNumber++;
                     
-                    tokenPos++;
-		}
+                tokenPos++;
+	}
 		
-		if(tokenPos >= input.length - 1){
-                    token = Symbol.EOF;
-                    return;
-                }
-                
+	if(tokenPos >= input.length - 1){
+            token = Symbol.EOF;
+            return;
+        }
+        System.out.println("Token + " + token);
         if(input[tokenPos] == '/' && input[tokenPos+1] == '/'){
             while(tokenPos < input.length && input[tokenPos] != '\n'){
                 tokenPos++;
@@ -154,6 +157,7 @@ public class Lexer {
             }
             lineNumber++;
             nextToken();
+            return;
         }
                 
         String buffer = "";
@@ -167,7 +171,7 @@ public class Lexer {
             if(buffer != ""){
                 token = keywordsTable.get(buffer);
                 if(token == null){
-                    if(buffer == "true" || buffer == "false")
+                    if(buffer.equals("true") || buffer.equals("false"))
                         token = Symbol.LITERALBOOLEAN;
                     else
                         token = Symbol.IDENT;
@@ -272,7 +276,15 @@ public class Lexer {
                     }else
                         error.show("inválido na gramática");
                 break;
+                case '&':
+                    if(input[tokenPos+1] == '&'){
+                        token = Symbol.AND;
+                        tokenPos++;
+                    }else
+                        error.show("inválido na gramática");
+                break;
                 default:
+                    System.out.println(token + " não é valido");
                     error.show("inválido na gramática");
                 break;
             }

@@ -4,7 +4,7 @@
     Victor Fernandes de Oliveira Brayner    RA: 743600
 */
 
-package F01_Jose_Marcus_Victor;
+package trabalho01;
 
 import AST.*; 
 import java.io.*;
