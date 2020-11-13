@@ -30,6 +30,6 @@ public class Variable {
     }
     
     public Type getType() {
-    return type;
+        return type;
     }
 }

@@ -14,7 +14,7 @@ public class Lexer {
     
     static private Hashtable<String, Symbol> keywordsTable;
     public Symbol token;
-    private String stringValue;
+    public String stringValue;
     private int numberValue;
     public int tokenPos;
     private int lastTokenPos;
@@ -37,10 +37,10 @@ public class Lexer {
         keywordsTable.put("write", Symbol.WRITE);
         keywordsTable.put("begin", Symbol.BEGIN);
         keywordsTable.put("end", Symbol.END);
-        keywordsTable.put("readInt", Symbol.READINT);
-        keywordsTable.put("readString", Symbol.READSTRING);
-        keywordsTable.put("print", Symbol.PRINT);
-        keywordsTable.put("println", Symbol.PRINTLN);
+        //keywordsTable.put("readInt", Symbol.READINT);
+        //keywordsTable.put("readString", Symbol.READSTRING);
+        //keywordsTable.put("print", Symbol.PRINT);
+        //keywordsTable.put("println", Symbol.PRINTLN);
         keywordsTable.put("int", Symbol.INTEGER);
         keywordsTable.put("boolean", Symbol.BOOLEAN);
         keywordsTable.put("String", Symbol.STRING);
@@ -146,7 +146,7 @@ public class Lexer {
             token = Symbol.EOF;
             return;
         }
-        System.out.println("Token + " + token);
+
         if(input[tokenPos] == '/' && input[tokenPos+1] == '/'){
             while(tokenPos < input.length && input[tokenPos] != '\n'){
                 tokenPos++;
@@ -240,7 +240,7 @@ public class Lexer {
                         token = Symbol.EQ;
                         tokenPos++;
                     }else
-                        token = Symbol.ASSIGN;                           
+                        token = Symbol.ASSIGN;                          
                 break;
                 case ')':
                     token = Symbol.RIGHTPAR;
@@ -284,7 +284,6 @@ public class Lexer {
                         error.show("inválido na gramática");
                 break;
                 default:
-                    System.out.println(token + " não é valido");
                     error.show("inválido na gramática");
                 break;
             }

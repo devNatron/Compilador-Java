@@ -16,13 +16,17 @@ public class Compiler {
     
     private Lexer lexer;
     private Hashtable<String, Variable> symbolTable;
+    private Hashtable<String, Func> symbolTable2;
     private CompilerError error;
+    private boolean mainDefinida;
 
     public Program compile(char m_input[], PrintWriter PW) {
 
         error = new CompilerError( lexer, new PrintWriter(PW) );
         lexer = new Lexer(m_input, error);
         symbolTable = new Hashtable();
+        symbolTable2 = new Hashtable();
+
         error.setLexer(lexer);
         
         lexer.nextToken();
@@ -48,7 +52,11 @@ public class Compiler {
             else
                 break;
         }
-
+        
+        //ver parametros da main, retornos etc
+        if(symbolTable2.get("main") == null)
+           error.show("programa precisa de função main");
+            
         return new Program(funcs);
     }
 
@@ -93,8 +101,8 @@ public class Compiler {
                 error.show("id esperado");
         }else
             error.show("def esperado");
-        //Por algum motivo, este nextToken evita loop eterno
-        //lexer.nextToken();
+        //inserir na hashtable
+        symbolTable2.put(f.getName(), f);
         return f;
     }
     
@@ -102,7 +110,7 @@ public class Compiler {
     private Expr expr() {
         Expr left, right;
         left = exprAnd();
-        
+
         while(lexer.token == Symbol.OR){
             lexer.nextToken();
             right = exprAnd();
@@ -174,12 +182,13 @@ public class Compiler {
     private Expr exprMult() {
         Expr left, right;
         left = exprUnary();
+        
         Symbol op;
         while ((op = lexer.token) == Symbol.MULT || op == Symbol.DIV) {
             lexer.nextToken();
             right = exprUnary();
             // semantic analysis
-            //if (left.getType() != Type.intType || right.getType() != Type.intType)
+            //if (left.getType() != right.getType())
                 //error.signal("Expression of type integer expected");
             left = new CompositeExpr(left, op, right);
         }
@@ -192,6 +201,7 @@ public class Compiler {
         if((op = lexer.token) == Symbol.PLUS || op == Symbol.MINUS){
             lexer.nextToken();
         } 
+        
         return exprPrimary();
     }
     
@@ -208,28 +218,26 @@ public class Compiler {
             }else{
                 //lexer.nextToken();
                 //trocar pra variableExpr()
-                //ver composite expr (a + b e etc)
-                e = expr();
+                e = null;
             }
         }else
             e = exprLiteral();
         
-        return e;
+        return e; 
     }
     
     //ExprLiteral ::= LiteralInt | LiteralBoolean | LiteralString
     private Expr exprLiteral() {
         Expr e = null;
-        if(lexer.token == Symbol.LITERALINT){
+        if(lexer.token.equals(Symbol.LITERALINT)){
             e = new ExprLiteral(new IntType());
-        }else if(lexer.token == Symbol.LITERALSTRING){
+        }else if(lexer.token.equals(Symbol.LITERALSTRING)){
             e = new ExprLiteral(new StringType());
-        }else if (lexer.token == Symbol.LITERALBOOLEAN){
+        }else if (lexer.token.equals(Symbol.LITERALBOOLEAN)){
             e = new ExprLiteral(new BooleanType());
-        }else{
-            System.out.println("Token: ");
+        }else
             error.show("literal errado");
-        }
+        
         lexer.nextToken();
         return e;
     }
@@ -259,11 +267,10 @@ public class Compiler {
         v = new Param(name);
         v.setType(typeVar);
         
-        // // semantic analysis
-        // if (symbolTable.getInLocal(name) != null)
-        // error.show("Parameter " + name + " has already been declared");
-
-        //symbolTable.putInLocal(name, v);
+        if (symbolTable.get(name) != null)
+            error.show("Parâmetro " + name + " já foi declarado");
+        
+        symbolTable.put(name, v);
         paramList.addElement(v);
         lexer.nextToken();
     }
@@ -282,7 +289,7 @@ public class Compiler {
                 result = Type.StringType;
                 break;
             default:
-                error.show("Type esperado");
+                error.show("tipo esperado");
                 result = Type.undefinedType;
         }
         lexer.nextToken();
@@ -295,13 +302,13 @@ public class Compiler {
         
         Symbol s;
         Stat stat;
-        //while ((s = lexer.token) != Symbol.ELSE && s != Symbol.ENDIF && s != Symbol.ENDW) {
+
         while ((s = lexer.token) == Symbol.IF || s == Symbol.WHILE || s == Symbol.IDENT || s == Symbol.RETURN || s == Symbol.VAR) {
+
             stat = stat();
 
             if (stat != null) {
                 v.add(stat);
-                //lexer.nextToken();
             }
         }
         return new StatList(v);
@@ -328,9 +335,10 @@ public class Compiler {
 
     //AssignExprStat ::= Expr [ "=" Expr ] ";"
     private AssignExprStat assignExprStat() {
+        
         Expr left = expr();
         Expr right = null;
-        
+
         if ( lexer.token == Symbol.ASSIGN ){
             lexer.nextToken();
             right = expr();
@@ -420,12 +428,13 @@ public class Compiler {
         String name = (String) lexer.getStringValue();
         lexer.nextToken();
 
-        // // semantic analysis
-        /*
-        if (symbolTable.putInLocal(name, v) != null) {
-            error.show("Variable " + name + " has already been declared");
-        }
-        */
+        Variable va = new Variable(name);
+        va.setType(typeVar);
+        
+        if (symbolTable.get(name) != null)
+            error.show("Variável " + name + " já foi declarada");
+        
+        symbolTable.put(name, va);
         
         if (lexer.token != Symbol.SEMICOLON)
             error.show("; esperado");
