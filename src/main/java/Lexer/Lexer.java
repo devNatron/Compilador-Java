@@ -37,10 +37,8 @@ public class Lexer {
         keywordsTable.put("write", Symbol.WRITE);
         keywordsTable.put("begin", Symbol.BEGIN);
         keywordsTable.put("end", Symbol.END);
-        //keywordsTable.put("readInt", Symbol.READINT);
-        //keywordsTable.put("readString", Symbol.READSTRING);
-        //keywordsTable.put("print", Symbol.PRINT);
-        //keywordsTable.put("println", Symbol.PRINTLN);
+        keywordsTable.put("true", Symbol.TRUE);
+        keywordsTable.put("false", Symbol.FALSE);
         keywordsTable.put("int", Symbol.INTEGER);
         keywordsTable.put("boolean", Symbol.BOOLEAN);
         keywordsTable.put("String", Symbol.STRING);
@@ -163,7 +161,7 @@ public class Lexer {
         String buffer = "";
 
         if(Character.isLetter(input[tokenPos])){
-            while(Character.isLetter(input[tokenPos])){
+            while(Character.isLetter(input[tokenPos]) || Character.isDigit(input[tokenPos])){
                 buffer += input[tokenPos];
                 tokenPos++;
             }

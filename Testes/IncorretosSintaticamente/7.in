@@ -1,0 +1,25 @@
+def soma(int x, int y):int{
+  var int result;
+  var int i;
+  var boolean logico;
+
+  i = 1;
+  result = x + y;
+
+  while i > 0 do
+    if result != 3 && i < 4 then
+      i = i * 10;
+    else
+      if result < 5 then
+        logico = true //falta ;
+      endif
+    endif
+  endw /*Fim do while*/
+  return result;
+}
+
+def main{
+  var int soma;
+
+  soma = soma(3,2);
+}

@@ -1,0 +1,19 @@
+def soma(int x , int y):int{
+  var int result;
+  var int i;
+
+  i = 1;
+  result = x + y;
+
+  if i <* 10 then
+    i = i * 2;
+  endif
+  
+  return result;
+}
+
+def main{
+  var int soma;
+
+  soma = soma(3,2);
+}

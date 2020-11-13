@@ -1,0 +1,17 @@
+def somaD (int c, int d): int{
+  return c + d;
+}
+
+def somaP (int a, int b): int{
+  var int x;
+  x = 1;
+
+  while x != 4 do
+    a = somaD (a,b);
+    x = x + 1;
+  endw
+}
+
+def main{
+  println (somaP (1,2));
+}

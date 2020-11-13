@@ -54,8 +54,8 @@ public class Compiler {
         }
         
         //ver parametros da main, retornos etc
-        if(symbolTable2.get("main") == null)
-           error.show("programa precisa de função main");
+        //if(symbolTable2.get("main") == null)
+           //error.show("programa precisa de função main");
             
         return new Program(funcs);
     }
@@ -218,7 +218,7 @@ public class Compiler {
             }else{
                 //lexer.nextToken();
                 //trocar pra variableExpr()
-                e = null;
+                e = new VariableExpr(name);
             }
         }else
             e = exprLiteral();
@@ -233,10 +233,11 @@ public class Compiler {
             e = new ExprLiteral(new IntType());
         }else if(lexer.token.equals(Symbol.LITERALSTRING)){
             e = new ExprLiteral(new StringType());
-        }else if (lexer.token.equals(Symbol.LITERALBOOLEAN)){
+        }else if (lexer.token.equals(Symbol.LITERALBOOLEAN) || lexer.token.equals(Symbol.TRUE) || lexer.token.equals(Symbol.FALSE)){
             e = new ExprLiteral(new BooleanType());
-        }else
+        }else{
             error.show("literal errado");
+        }
         
         lexer.nextToken();
         return e;
@@ -267,8 +268,8 @@ public class Compiler {
         v = new Param(name);
         v.setType(typeVar);
         
-        if (symbolTable.get(name) != null)
-            error.show("Parâmetro " + name + " já foi declarado");
+        //if (symbolTable.get(name) != null)
+            //error.show("Parâmetro " + name + " já foi declarado");
         
         symbolTable.put(name, v);
         paramList.addElement(v);
@@ -344,9 +345,9 @@ public class Compiler {
             right = expr();
         }
         
-        if (lexer.token != Symbol.SEMICOLON)
+        if (lexer.token != Symbol.SEMICOLON){
             error.show("; esperado");
-        else
+        }else
             lexer.nextToken();
         
         return new AssignExprStat( left, right );
@@ -405,9 +406,7 @@ public class Compiler {
         lexer.nextToken();
         Expr e = expr();
         // // semantic analysis
-        // if (currentFunction == null)
-        // error.show("return statement inside a procedure");
-        // else if (!checkAssignment(currentFunction.getReturnType(), e.getType()))
+        // if (!checkAssignment(currentFunction.getReturnType(), e.getType()))
         // error.show("Return type does not match function type");
         if (lexer.token != Symbol.SEMICOLON)
             error.show("; esperado");
@@ -431,8 +430,8 @@ public class Compiler {
         Variable va = new Variable(name);
         va.setType(typeVar);
         
-        if (symbolTable.get(name) != null)
-            error.show("Variável " + name + " já foi declarada");
+        //if (symbolTable.get(name) != null)
+            //error.show("Variável " + name + " já foi declarada");
         
         symbolTable.put(name, va);
         
