@@ -37,4 +37,9 @@ public class ExprUnary extends Expr {
         return expr.getType();
     }
 
+    @Override
+    public void setType(Type type) {
+       //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }

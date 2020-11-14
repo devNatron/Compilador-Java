@@ -64,7 +64,7 @@ public class Main {
             program = null;
             // the generated code goes to a file and so are the errors
             try {
-                program = compiler.compile(input, printWriter);
+                program = compiler.compile(input, printWriter, args[0]);
             } catch ( RuntimeException e ) {
                 System.out.println(e);
             }

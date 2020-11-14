@@ -35,4 +35,9 @@ public class ExprLiteral extends Expr {
         return t;
     }
 
+    @Override
+    public void setType(Type type) {
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }

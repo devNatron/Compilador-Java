@@ -14,14 +14,16 @@ public class CompilerError {
     private Lexer lexer;
     PrintWriter out;
     private boolean thereWasAnError;
+    String fileName;
     
     public CompilerError( PrintWriter out ) {
         this.out = out;
     }
     
-    public CompilerError(Lexer lexer, PrintWriter out ) {
+    public CompilerError(Lexer lexer, PrintWriter out , String fileName) {
         this.out = out;
         this.lexer = lexer;
+        this.fileName = fileName;
     }
     
     public void setLexer( Lexer lexer ) {
@@ -34,17 +36,16 @@ public class CompilerError {
     
     public void show( String strMessage, boolean goPreviousToken ) {
         if ( goPreviousToken ) {
-            out.println("Error at line " + lexer.getLineNumberBeforeLastToken() + ": ");
+            out.println("\n " + fileName + ":" + lexer.getLineNumberBeforeLastToken() + ":" + strMessage);
             out.println( lexer.getLineBeforeLastToken() );
         }
         else {
-            out.println("Error at line " + lexer.getLineNumber() + ": ");
+            out.println("\n" + fileName + ":" + lexer.getLineNumber() + ":" + strMessage);
             out.println(lexer.getCurrentLine());
         }
-        out.println( strMessage );
         out.flush();
         if ( out.checkError() )
-            System.out.println("Error in signaling an error");
+            System.out.println("Erro ao printar erro");
         thereWasAnError = true;
     }
     

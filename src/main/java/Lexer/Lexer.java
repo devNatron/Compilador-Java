@@ -157,7 +157,7 @@ public class Lexer {
             nextToken();
             return;
         }
-                
+        
         String buffer = "";
 
         if(Character.isLetter(input[tokenPos])){
@@ -169,10 +169,7 @@ public class Lexer {
             if(buffer != ""){
                 token = keywordsTable.get(buffer);
                 if(token == null){
-                    if(buffer.equals("true") || buffer.equals("false"))
-                        token = Symbol.LITERALBOOLEAN;
-                    else
-                        token = Symbol.IDENT;
+                    token = Symbol.IDENT;
                     stringValue = buffer;
                 }
             }
@@ -182,10 +179,13 @@ public class Lexer {
                 tokenPos++;
             }
             
-            numberValue = Integer.parseInt(buffer);
-            
+            try {
+                numberValue = Integer.parseInt(buffer);
+            } catch( NumberFormatException e){
+                error.show("número fora dos limites");
+            }
             if(numberValue > 2147483647 || numberValue < 0)
-                error.show("overflow int");
+                error.show("número fora dos limites");
             
             token = Symbol.LITERALINT;
         } else if(input[tokenPos] == '"'){
@@ -286,6 +286,8 @@ public class Lexer {
                 break;
             }
             tokenPos++;
+            beforeLastTokenPos = lastTokenPos;
+            lastTokenPos = tokenPos - 1;
         }
     }
 }

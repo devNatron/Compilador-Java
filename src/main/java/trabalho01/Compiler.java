@@ -10,28 +10,31 @@ import AST.*;
 import Lexer.*;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.Iterator;
 
 public class Compiler {
     
     private Lexer lexer;
-    private Hashtable<String, Variable> symbolTable;
-    private Hashtable<String, Func> symbolTable2;
+    private SymbolTable symbolTable;
     private CompilerError error;
     private boolean mainDefinida;
+    private Func currentFunction;
 
-    public Program compile(char m_input[], PrintWriter PW) {
-
-        error = new CompilerError( lexer, new PrintWriter(PW) );
+    public Program compile(char m_input[], PrintWriter PW, String fileName) {
+        symbolTable = new SymbolTable();
+        error = new CompilerError( lexer, new PrintWriter(PW), fileName);
         lexer = new Lexer(m_input, error);
-        symbolTable = new Hashtable();
-        symbolTable2 = new Hashtable();
-
         error.setLexer(lexer);
         
         lexer.nextToken();
 
-        Program p = program();
+        Program p = null;
+        
+        try{
+            p = program();
+        } catch (Exception e){
+           e.printStackTrace();
+        }
         
         if ( error.wasAnErrorSignalled() )
             return null;
@@ -43,7 +46,7 @@ public class Compiler {
     private Program program() {
         ArrayList<Func> funcs = new ArrayList<>();
         
-        funcs.add(func());
+        createDefinedFuncs();
         
         while(lexer.token != Symbol.EOF){
             Func f = func();
@@ -52,12 +55,45 @@ public class Compiler {
             else
                 break;
         }
+
+        if(lexer.token != Symbol.EOF)
+            error.show("EOF esperado");
         
-        //ver parametros da main, retornos etc
-        //if(symbolTable2.get("main") == null)
-           //error.show("programa precisa de função main");
-            
+        if(symbolTable.getInGlobal("main") == null)
+            error.show("código precisa de uma função main");
+        
+           
         return new Program(funcs);
+    }
+    
+    private void createDefinedFuncs(){
+        Func f = new Func("readInt");
+        f.setParamList(new ParamList());
+        f.setReturnType(Type.intType);
+        symbolTable.putInGlobal("readInt", f);
+        
+        f = new Func("readString");
+        f.setParamList(new ParamList());
+        f.setReturnType(Type.StringType);
+        symbolTable.putInGlobal("readString", f);
+        
+        ParamList p = new ParamList();
+        Param param = new Param("expr", Type.undefinedType);
+        p.addElement(param);
+        
+        f = new Func("print");
+        f.setParamList(p);
+        f.setReturnType(null);
+        symbolTable.putInGlobal("print", f);
+        
+        p = new ParamList();
+        param = new Param("expr", Type.undefinedType);
+        p.addElement(param);
+        
+        f = new Func("println");
+        f.setParamList(p);
+        f.setReturnType(null);
+        symbolTable.putInGlobal("println", f);
     }
 
     // Func ::= "def" Id [ "(" ParamList ")" ] [ ":" Type ] "{" StatList "}"
@@ -67,29 +103,42 @@ public class Compiler {
         if(lexer.token == Symbol.DEF){
             lexer.nextToken();
             if(lexer.token == Symbol.IDENT){
-                f = new Func(lexer.getStringValue());
+                String name = lexer.getStringValue();
+                
+                if(symbolTable.getInGlobal(name) != null)
+                    error.show("Função " + name + " já foi declarada antes");
+
+                f = new Func(name);
+                currentFunction = f;
+                
+                symbolTable.putInGlobal(name, f);
+                
                 lexer.nextToken();
                 
                 if(lexer.token == Symbol.LEFTPAR){
                     lexer.nextToken();
+                    
+                    if(name.compareTo("main") == 0)
+                        error.show("função main não deve possuir parâmetros");
+                            
                     ParamList pl = paramList();
-
+                    f.setParamList(pl);
+                    
                     if(lexer.token == Symbol.RIGHTPAR){
                         lexer.nextToken();
-                        f.setParamList(pl);
                     }else
                         error.show(") esperado");
                 }
 
                 if(lexer.token == Symbol.COLON){
                     lexer.nextToken();
-                    Type t = type();
-                    f.setReturnType(t);
+                    f.setReturnType(type());
                 }
                 
                 if(lexer.token == Symbol.CURLYLEFTBRACE){
                     lexer.nextToken();
                     StatList st = statList();
+
                     if(lexer.token == Symbol.CURLYRIGHTBRACE){
                         lexer.nextToken();
                         f.setStatList(st);
@@ -101,8 +150,8 @@ public class Compiler {
                 error.show("id esperado");
         }else
             error.show("def esperado");
-        //inserir na hashtable
-        symbolTable2.put(f.getName(), f);
+        
+        symbolTable.removeLocalIdent();
         return f;
     }
     
@@ -114,12 +163,12 @@ public class Compiler {
         while(lexer.token == Symbol.OR){
             lexer.nextToken();
             right = exprAnd();
+            if (!checkBoolean(left.getType(), right.getType()))
+                error.show("esperado tipo booleano na expressão");
+            
             left = new CompositeExpr(left, Symbol.OR, right);
         }
-            // // semantic analysis
-            // if (left.getType() != Type.booleanType || right.getType() !=
-            // Type.booleanType)
-            // error.signal("Expression of boolean type expected");;
+        
         return left;
     }
 
@@ -131,13 +180,20 @@ public class Compiler {
         while (lexer.token == Symbol.AND) {
             lexer.nextToken();
             right = exprRel();
+            
+            if (!checkBoolean(left.getType(), right.getType()))
+                error.show("esperado tipo booleano na expressão");
+            
             left = new CompositeExpr(left, Symbol.AND, right);
-            // // semantic analysis
-            // if (left.getType() != Type.booleanType || right.getType() !=
-            // Type.booleanType)
-            // error.signal("Expression of boolean type expected");
         }
         return left;
+    }
+    
+    private boolean checkBoolean(Type left, Type right){
+        if("undefined".equals(left.getName()) || "undefined".equals(right.getName()))
+            return true;
+        else
+            return "boolean".equals(left.getName()) && "boolean".equals(right.getName());
     }
 
     // ExprRel ::= ExprAdd [ RelOp ExprAdd ]
@@ -151,10 +207,9 @@ public class Compiler {
             lexer.nextToken();
             right = exprAdd();
 
-            // // semantic analysis
-            // if (left.getType() != right.getType())
-            // error.signal("Type error in expression");
-
+            if (!checkAssign(left.getType(), right.getType()))
+                error.show("conflito de tipos na expressão");
+                
             left = new CompositeExpr(left, op, right);
         }
         return left;
@@ -170,12 +225,20 @@ public class Compiler {
             lexer.nextToken();
             right = exprMult();
 
-            // // semantic analysis
-            // if (left.getType() != right.getType())
-            // error.signal("Type error in expression");
+            if (!checkMathExpr(left.getType(), right.getType()))
+                error.show("esperado tipo inteiro na expressão");
+            
             left = new CompositeExpr(left, op, right);
         }
         return left;
+    }
+    
+    private boolean checkMathExpr(Type left, Type right){
+        boolean orLeft = "int".equals(left.getName()) || "undefined".equals(left.getName());
+        
+        boolean orRight = "int".equals(right.getName()) || "undefined".equals(right.getName());
+        
+        return orLeft && orRight;
     }
 
     // ExprMult ::= ExprUnary { ( "*" | "/" ) ExprUnary }
@@ -187,9 +250,10 @@ public class Compiler {
         while ((op = lexer.token) == Symbol.MULT || op == Symbol.DIV) {
             lexer.nextToken();
             right = exprUnary();
-            // semantic analysis
-            //if (left.getType() != right.getType())
-                //error.signal("Expression of type integer expected");
+
+            if (!checkMathExpr(left.getType(), right.getType()))
+                error.show("esperado tipo inteiro na expressão");
+            
             left = new CompositeExpr(left, op, right);
         }
         return left;
@@ -214,11 +278,19 @@ public class Compiler {
 
             if(lexer.token == Symbol.LEFTPAR){
                 lexer.nextToken();
+                
+                if(symbolTable.getInGlobal(name) == null)
+                    error.show("função usada ainda não declarada");
+
                 e = funcCall(name);
             }else{
-                //lexer.nextToken();
-                //trocar pra variableExpr()
+                Variable v = (Variable) symbolTable.getInLocal(name);
                 e = new VariableExpr(name);
+                
+                if(v == null)
+                    error.show("variável usada ainda não declarada");
+                else
+                    e.setType(v.getType());
             }
         }else
             e = exprLiteral();
@@ -236,7 +308,8 @@ public class Compiler {
         }else if (lexer.token.equals(Symbol.LITERALBOOLEAN) || lexer.token.equals(Symbol.TRUE) || lexer.token.equals(Symbol.FALSE)){
             e = new ExprLiteral(new BooleanType());
         }else{
-            error.show("literal errado");
+            error.show("literal não identificado");
+            e = new ExprLiteral(new UndefinedType());
         }
         
         lexer.nextToken();
@@ -265,15 +338,16 @@ public class Compiler {
             error.show("Id esperado");
         
         String name = (String) lexer.getStringValue();
+        
+        lexer.nextToken();
+        
+        if (symbolTable.getInLocal(name) != null)
+            error.show("Parâmetro " + name + " já existe");
+
         v = new Param(name);
         v.setType(typeVar);
-        
-        //if (symbolTable.get(name) != null)
-            //error.show("Parâmetro " + name + " já foi declarado");
-        
-        symbolTable.put(name, v);
+        symbolTable.putInLocal(name, v);
         paramList.addElement(v);
-        lexer.nextToken();
     }
 
     //Type ::= "int" | "boolean" | "String"
@@ -284,6 +358,12 @@ public class Compiler {
                 result = Type.intType;
                 break;
             case BOOLEAN:
+                result = Type.booleanType;
+                break;
+            case TRUE:
+                result = Type.booleanType;
+                break;
+            case FALSE:
                 result = Type.booleanType;
                 break;
             case STRING:
@@ -299,11 +379,11 @@ public class Compiler {
 
     // StatList ::= { Stat }
     private StatList statList() {
-        ArrayList<Stat> v = new ArrayList<Stat>();
+        ArrayList<Stat> v = new ArrayList<>();
         
         Symbol s;
         Stat stat;
-
+        
         while ((s = lexer.token) == Symbol.IF || s == Symbol.WHILE || s == Symbol.IDENT || s == Symbol.RETURN || s == Symbol.VAR) {
 
             stat = stat();
@@ -312,6 +392,12 @@ public class Compiler {
                 v.add(stat);
             }
         }
+
+        if(lexer.token != Symbol.CURLYRIGHTBRACE && lexer.token != Symbol.ENDIF && lexer.token != Symbol.ENDW && lexer.token != Symbol.ELSE){
+            error.show("statement inválido");
+            lexer.nextToken();
+        }
+        
         return new StatList(v);
     }
 
@@ -329,20 +415,25 @@ public class Compiler {
             case IDENT:
                 return assignExprStat();
             default:
-                error.show("stat errado");
+                error.show("statement inválido");
+                lexer.nextToken();
                 return null;
         }
     }
 
     //AssignExprStat ::= Expr [ "=" Expr ] ";"
     private AssignExprStat assignExprStat() {
-        
+
         Expr left = expr();
         Expr right = null;
 
         if ( lexer.token == Symbol.ASSIGN ){
             lexer.nextToken();
             right = expr();
+            
+            if (!checkAssign(left.getType(), right.getType()))
+                error.show("tipos das expressões são diferentes: " + left.getType().getName() + " e " + right.getType().getName());
+                
         }
         
         if (lexer.token != Symbol.SEMICOLON){
@@ -357,8 +448,9 @@ public class Compiler {
     private IfStat ifStat() {
         lexer.nextToken();
         Expr e = expr();
-       // if (e.getType() != Type.booleanType)
-            //error.signal("Boolean type expected in if expression");
+        
+       if (e.getType() != Type.booleanType)
+            error.show("expressão não é do tipo booleana");
 
         if (lexer.token != Symbol.THEN)
             error.show("then esperado");
@@ -384,8 +476,9 @@ public class Compiler {
 
         Expr expr = expr();
 
-        //if (!checkWhileExpr(expr.getType()))
-           // error.show("Boolean expression expected");
+        if (!checkWhileExpr(expr.getType()))
+           error.show("expressão não é do tipo booleana");
+            
         if (lexer.token != Symbol.DO)
             error.show("do esperado");
         
@@ -400,20 +493,29 @@ public class Compiler {
 
         return new WhileStat(expr, doPart);
     }
+    
+    private boolean checkWhileExpr(Type t){
+        return "undefined".equals(t.getName()) || "boolean".equals(t.getName());
+    }
 
     //ReturnStat ::= "return" Expr ";"
     private ReturnStat returnStat() {
         lexer.nextToken();
         Expr e = expr();
-        // // semantic analysis
-        // if (!checkAssignment(currentFunction.getReturnType(), e.getType()))
-        // error.show("Return type does not match function type");
+
+        if (!checkAssign(currentFunction.getReturnType(), e.getType()))
+            error.show("Retorno é diferente do tipo de retorno da função");
+        
         if (lexer.token != Symbol.SEMICOLON)
             error.show("; esperado");
         
         lexer.nextToken();
         
         return new ReturnStat(e);
+    }
+    
+    private boolean checkAssign(Type left, Type right){
+        return left.getName().equals(right.getName()) || "undefined".equals(left.getName()) || "undefined".equals(right.getName());
     }
 
     //VarDecStat ::= "var" Type Id ";"
@@ -424,59 +526,91 @@ public class Compiler {
 
         if (lexer.token != Symbol.IDENT)
             error.show("id esperado");
+        
         String name = (String) lexer.getStringValue();
+        
+        if(symbolTable.getInLocal(name) != null)
+            error.show("variável já foi declarada");
+
         lexer.nextToken();
 
         Variable va = new Variable(name);
         va.setType(typeVar);
-        
-        //if (symbolTable.get(name) != null)
-            //error.show("Variável " + name + " já foi declarada");
-        
-        symbolTable.put(name, va);
+        symbolTable.putInLocal(name, va);
         
         if (lexer.token != Symbol.SEMICOLON)
             error.show("; esperado");
         
         lexer.nextToken();
         
-        VarDecStat v = new VarDecStat(typeVar, name);
-
-        return v;
+        return new VarDecStat(typeVar, name);
     }
 
     //FuncCall ::= Id "(" [ Expr { "," Expr } ] ")"
     private FuncCall funcCall(String id) {
-        
         ExprList anExprList = null;
-        Func f = new Func(id);
-        //Func p = (Func) symbolTable.getInGlobal(name);
+        Func p = (Func) symbolTable.getInGlobal(id);
 
+        //Estamos verificando se p != null pois ha risco de ocorrer uma NULLPOINTEREXCEPTION
+        
         if (lexer.token != Symbol.RIGHTPAR) {
-            // The parameter list is used to check if the arguments to the
-            // procedure have the correct types
-            anExprList = new ExprList();
-            
-            anExprList.addElement(expr());
-            
-            while(lexer.token == Symbol.COMMA){
-                lexer.nextToken();
-                anExprList.addElement(expr());
-            }
-            
+            if(p != null)
+                anExprList = exprList(p.getParamList());
+
             if (lexer.token != Symbol.RIGHTPAR){
                 error.show(") faltando");
             }else
                 lexer.nextToken();
         } else {
-            // semantic analysis
-            // does the procedure has no parameter ?
-            /*
-            if (p.getParamList() != null && p.getParamList().getSize() != 0)
-                error.show("Parameter expected");
-            */
+            if(p != null)
+                if (p.getParamList() != null && p.getParamList().getSize() != 0)
+                    error.show("parâmetro esperado na chamada de função");
+            
             lexer.nextToken();
         }
-        return new FuncCall(f, anExprList);
+        return new FuncCall(p, anExprList);
+    }
+    
+    private ExprList exprList(ParamList paramList){
+    
+        ExprList anExprList;
+        boolean firstErrorMessage = true;
+        
+        if(lexer.token == Symbol.RIGHTPAR)
+            return null;
+        else{
+            Param param;
+            int sizeParamList = paramList.getSize();
+            Iterator e = paramList.getParamList().iterator();
+            anExprList = new ExprList();
+            
+            while(true){
+
+                if(e.hasNext())
+                    param = (Param) e.next(); 
+                else
+                    param = null;
+
+                if(sizeParamList < 1 && firstErrorMessage){
+                    error.show("número de parâmetros errado na chamada da função");
+                    firstErrorMessage = false;
+                }
+                sizeParamList--;
+                Expr anExpr = expr();
+
+                if(!checkAssign(param.getType(), anExpr.getType())){
+                    error.show("tipo errado na passagem do parâmetro");
+                }
+                anExprList.addElement(anExpr);
+                if(lexer.token == Symbol.COMMA){
+                    lexer.nextToken();
+                }else
+                    break;
+        }
+        if((sizeParamList > 0 || sizeParamList < 0) && firstErrorMessage)
+            error.show("número de parâmetros errado na chamada da função");
+        
+        return anExprList;
+        }
     }
 }

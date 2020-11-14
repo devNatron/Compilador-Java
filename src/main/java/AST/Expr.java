@@ -9,4 +9,5 @@ package AST;
 abstract public class Expr {
     abstract public void genC(PW pw);
     abstract public Type getType();
+    abstract public void setType(Type type);
 }
