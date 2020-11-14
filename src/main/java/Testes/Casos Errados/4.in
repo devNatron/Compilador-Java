@@ -6,14 +6,14 @@ def main {
 
   res = x + y - z;
 
-  if res <= 0 then
+  if res = 0 then
     print ("Positivo");
   endif
 
   var int i;
   i = 0;
 
-  while i = 10 do
+  while i >= 10 do
     i = i + 1;
   endw
 }

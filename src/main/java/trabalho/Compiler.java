@@ -55,7 +55,7 @@ public class Compiler {
             else
                 break;
         }
-
+        
         if(lexer.token != Symbol.EOF)
             error.show("EOF esperado");
         
@@ -502,8 +502,10 @@ public class Compiler {
     private ReturnStat returnStat() {
         lexer.nextToken();
         Expr e = expr();
-
-        if (!checkAssign(currentFunction.getReturnType(), e.getType()))
+        
+        if(currentFunction.getReturnType() == null){
+            error.show("Função sem retorno");
+        }else if (!checkAssign(currentFunction.getReturnType(), e.getType()))
             error.show("Retorno é diferente do tipo de retorno da função");
         
         if (lexer.token != Symbol.SEMICOLON)
