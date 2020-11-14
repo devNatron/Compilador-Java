@@ -6,8 +6,8 @@
 
 package Lexer;
 
+import trabalho.CompilerError;
 import java.util.Hashtable;
-import trabalho01.*;
 
 
 public class Lexer {

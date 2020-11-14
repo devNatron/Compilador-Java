@@ -4,7 +4,7 @@
     Victor Fernandes de Oliveira Brayner    RA: 743600
 */
 
-package trabalho01;
+package trabalho;
 
 import Lexer.*; 
 import java.io.*;

@@ -4,7 +4,7 @@
     Victor Fernandes de Oliveira Brayner    RA: 743600
 */
 
-package trabalho01;
+package trabalho;
 
 import AST.*;
 import Lexer.*;
@@ -33,7 +33,7 @@ public class Compiler {
         try{
             p = program();
         } catch (Exception e){
-           e.printStackTrace();
+           //e.printStackTrace();
         }
         
         if ( error.wasAnErrorSignalled() )

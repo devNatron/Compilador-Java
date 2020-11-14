@@ -1,16 +1,14 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package trabalho01;
+    José Vitor Novaes Santos                RA: 743556
+    Marcus Vinicius Natrielli Garcia        RA: 743578
+    Victor Fernandes de Oliveira Brayner    RA: 743600
+*/
+
+
+package trabalho;
 
 import java.util.Hashtable;
 
-/**
- *
- * @author super
- */
 public class SymbolTable {
     
     private Hashtable globalTable, localTable;
