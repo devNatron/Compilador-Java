@@ -17,13 +17,13 @@ public class CompositeStatement extends Stat {
     }
 
     public void genC(PW pw) {
-        // pw.println("{");
-        // if (statementList != null) {
-        // pw.add();
-        // statementList.genC(pw);
-        // pw.sub();
-        // }
-        // pw.println("}");
+        pw.println("{");
+        if (statementList != null) {
+            pw.add();
+            statementList.genC(pw);
+            pw.sub();
+        }
+        pw.println("}");
     }
 
     public StatList getStatementList() {

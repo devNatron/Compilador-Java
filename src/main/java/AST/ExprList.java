@@ -22,13 +22,14 @@ public class ExprList {
     }
     
     public void genC( PW pw ) {
-        /*
+        
         int size = v.size();
         Iterator e = v.iterator();
+        
         while ( e.hasNext() ) {
-        ((Expr ) e.next()).genC(pw);
-        if ( --size > 0 )
-        pw.out.print(", ");
-        }*/
+            ((Expr ) e.next()).genC(pw);
+            if ( --size > 0 )
+                pw.out.print(", ");
+        }
     }
 }

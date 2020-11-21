@@ -19,18 +19,15 @@ public class ExprUnary extends Expr {
     }
 
     public void genC(PW pw) {
-        // switch(op){
-        // case Symbol.PLUS:
-        // pw.out.print("+");
-        // break;
-        // case Symbol.MINUS:
-        // pw.out.print("-");
-        // break;
-        // case Symbol.NOT:
-        // pw.out.print("!");
-        // break;
-        // }
-        // expr.genC(pw);
+        switch(op){
+            case PLUS:
+                pw.out.print("+");
+            break;
+            case MINUS:
+                pw.out.print("-");
+            break;
+        }
+        expr.genC(pw);
     }
 
     public Type getType() {

@@ -19,16 +19,13 @@ public class WhileStat extends Stat {
     }
 
     public void genC(PW pw) {
-        // pw.print("while ( ");
-        // expr.genC(pw);
-        // pw.out.println(" )");
-        // if ( statement instanceof CompositeStatement )
-        // statement.genC(pw);
-        // else {
-        // pw.add();
-        // statement.genC(pw);
-        // pw.sub();
-        // }
+        pw.out.print("while ( ");
+        expr.genC(pw);
+        pw.out.println(" ){");
+        pw.out.print("\t");
+        sl.genC(pw);
+        pw.out.println("\t}\n");
+        
     }
 
 }

@@ -15,7 +15,7 @@ public class Lexer {
     static private Hashtable<String, Symbol> keywordsTable;
     public Symbol token;
     public String stringValue;
-    private int numberValue;
+    public int numberValue;
     public int tokenPos;
     private int lastTokenPos;
     public char input [];

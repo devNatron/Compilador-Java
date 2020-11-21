@@ -8,7 +8,7 @@ package AST;
 
 abstract public class Type {
     
-    //abstract public String getCname();
+    abstract public String getCname();
     private String name;
     
     public Type( String name ) {

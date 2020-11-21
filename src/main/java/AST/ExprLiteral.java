@@ -11,24 +11,18 @@ import Lexer.Symbol;
 public class ExprLiteral extends Expr {
 
     Type t;
+    String literal;
     
-    public ExprLiteral(Type t) {
+    public ExprLiteral(Type t, String literal) {
         this.t = t;
+        this.literal = literal;
     }
 
     public void genC(PW pw) {
-        // switch(op){
-        // case Symbol.PLUS:
-        // pw.out.print("+");
-        // break;
-        // case Symbol.MINUS:
-        // pw.out.print("-");
-        // break;
-        // case Symbol.NOT:
-        // pw.out.print("!");
-        // break;
-        // }
-        // expr.genC(pw);
+        if("String".equals(t.getName()))
+            pw.out.print("\"" + literal + "\"");
+        else
+            pw.out.print(literal);
     }
 
     public Type getType() {

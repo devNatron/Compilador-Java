@@ -19,22 +19,23 @@ public class IfStat extends Stat {
     }
 
     public void genC(PW pw) {
-        // pw.print("if ( ");
-        // expr.genC(pw);
-        // pw.out.println(" ) { ");
-        // if ( thenPart != null ) {
-        // pw.add();
-        // thenPart.genC(pw);
-        // pw.sub();
-        // pw.println("}");
-        // }
-        // if ( elsePart != null ) {
-        // pw.println("else {");
-        // pw.add();
-        // elsePart.genC(pw);
-        // pw.sub();
-        // pw.println("}");
-        // }
+        pw.out.print("if ( ");
+        expr.genC(pw);
+        pw.out.println(" ) { ");
+        if ( thenPart != null ) {
+            pw.out.print("\t");
+            pw.add();
+            thenPart.genC(pw);
+            pw.sub();
+            pw.out.println("\t}");
+        }
+        if ( elsePart != null ) {
+            pw.out.println("else {");
+            pw.add();
+            elsePart.genC(pw);
+            pw.sub();
+            pw.out.println("\t}");
+        }
     }
 
 }

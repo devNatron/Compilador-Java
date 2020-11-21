@@ -17,20 +17,32 @@ public class FuncCall extends Expr {
         this.exprList = exprList;
     }
 
-    //public void genC(PW pw, boolean putParenthesis) {
-        // pw.out.print( function.getName() + "(" );
-        // if ( exprList != null )
-        // exprList.genC(pw);
-        // pw.out.print( ")");
-    //}
+    public void genC(PW pw) {
+        
+        switch(function.getName()){
+            case "print":
+                pw.out.print( "printf(");
+            break;
+            case "println":
+                pw.out.print( "printf(" );
+            break;
+            case "readInt":
+                pw.out.print( "scanf(\"%d\", &");
+            break;
+            case "readString":
+                pw.out.print( "scanf(\"%s\", " );
+            break;
+            default:
+                pw.out.print( function.getName() + "(" );
+        }
+        
+        if ( exprList != null )
+            exprList.genC(pw);
+        pw.out.print( ")");
+    }
 
     public Type getType() {
         return function.getReturnType();
-    }
-
-    @Override
-    public void genC(PW pw) {
-        
     }
 
     @Override

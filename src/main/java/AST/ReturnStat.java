@@ -14,8 +14,8 @@ public class ReturnStat extends Stat {
     }
 
     public void genC(PW pw) {
-        // pw.print("return ");
-        // expr.genC(pw);
-        // pw.out.println(";");
+        pw.out.print("return ");
+        expr.genC(pw);
+        pw.out.println(";");
     }
 }

@@ -1,7 +1,6 @@
-def soma:int{
-return true;
-}
 
 def main{
-soma();
+	var String a;
+	a = readString();
 }
+

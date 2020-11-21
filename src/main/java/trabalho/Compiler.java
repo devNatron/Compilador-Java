@@ -314,14 +314,14 @@ public class Compiler {
     private Expr exprLiteral() {
         Expr e = null;
         if(lexer.token.equals(Symbol.LITERALINT)){
-            e = new ExprLiteral(new IntType());
+            e = new ExprLiteral(new IntType(), Integer.toString(lexer.numberValue));
         }else if(lexer.token.equals(Symbol.LITERALSTRING)){
-            e = new ExprLiteral(new StringType());
+            e = new ExprLiteral(new StringType(), lexer.stringValue);
         }else if (lexer.token.equals(Symbol.LITERALBOOLEAN) || lexer.token.equals(Symbol.TRUE) || lexer.token.equals(Symbol.FALSE)){
-            e = new ExprLiteral(new BooleanType());
+            e = new ExprLiteral(new BooleanType(), lexer.stringValue);
         }else{
             error.show("literal não identificado");
-            e = new ExprLiteral(new UndefinedType());
+            e = new ExprLiteral(new UndefinedType(), lexer.stringValue);
         }
         
         lexer.nextToken();

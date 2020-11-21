@@ -19,10 +19,12 @@ public class StatList {
         return v;
     }
 
-    public void genC() {
-        // if ( v != null ) {
-        // for ( Stat s : v )
-        // s.genC();
-        // }
+    public void genC(PW pw) {
+        if ( v != null ) {
+            v.forEach(s -> {
+                pw.out.print( "\t");
+                s.genC(pw);
+            });
+        }
     }
 }

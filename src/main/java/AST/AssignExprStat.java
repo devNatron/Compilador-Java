@@ -15,10 +15,11 @@ public class AssignExprStat extends Stat {
     }
 
     public void genC(PW pw) {
-        // exprLeft.genC(pw);
-        // pw.print(" = ");
-        // if (exprRight != null)
-        // exprRight.genC(pw);
-        // pw.out.println(";");
+        exprLeft.genC(pw);
+        if (exprRight != null){
+            pw.out.print(" = ");
+            exprRight.genC(pw);
+        }
+        pw.out.println(";");
     }
 }

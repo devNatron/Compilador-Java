@@ -10,9 +10,10 @@ public class StringType extends Type {
     public StringType() {
         super("String");
     }
-    /*
+    
+    @Override
     public String getCname() {
-        return "String";
+        return "char *";
     }
-    */
+    
 }

@@ -16,8 +16,7 @@ public class VarDecStat extends Stat {
     }
 
     public void genC(PW pw) {
-        // pw.print("var ");
-        // pw.print(type.getName());
-        // pw.out.println(" "+ id +";");
+        pw.out.print(type.getCname() + " ");
+        pw.out.println(id +";");
     }
 }

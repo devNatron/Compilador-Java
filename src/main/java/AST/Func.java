@@ -49,14 +49,23 @@ public class Func {
     }
 
     public void genC(PW pw) {
-        // pw.out.print("def " + name + "(");
-        // if (paramList != null)
-        // paramList.genC(pw);
-        // pw.out.println(") : " + returnType.getCname() + "{");
-        // pw.add();
-        // pw.out.println();
-        // statList.getStatementList().genC(pw);
-        // pw.sub();
-        // pw.out.println("}");
+        if(returnType == null)
+            pw.out.print("void");
+        else
+            pw.out.print(returnType.getCname());
+        
+        pw.out.print(" " + name + "(");
+        
+        if (paramList != null)
+            paramList.genC(pw);
+        
+        pw.out.print("){");
+        pw.add();
+        pw.out.println();
+        
+        statList.genC(pw);
+
+        pw.sub();
+        pw.out.println("}");
     }
 }

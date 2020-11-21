@@ -1,3 +1,6 @@
+#include <stdio.h>
 
-teste.in:2:Retorno é diferente do tipo de retorno da função
-return true;
+void main(){
+	char * a;
+	a = scanf("%s", );
+}

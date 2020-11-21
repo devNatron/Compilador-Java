@@ -15,11 +15,13 @@ public class Program {
         this.arrayFunc = arrayFunc;
     }
 
-    public void genC() {
-        // System.out.println("#include <stdio.h>\n");
-        // if (arrayFunc != null) {
-        // for (Func f : arrayFunc)
-        // f.genC();
-        // }
+    public void genC(PW pw) {
+        pw.out.println("#include <stdio.h>\n");
+        
+        if (arrayFunc != null) {
+            arrayFunc.forEach(f -> {
+                    f.genC(pw);
+            });
+        }
     }
 }

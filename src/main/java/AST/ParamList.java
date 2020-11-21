@@ -35,16 +35,17 @@ public class ParamList {
     }
 
     public void genC(PW pw) {
-        // Parameter p;
-        // Iterator e = v.iterator();
-        // int size = v.size();
-        // while(e.hasNext()){
-        // p = (Parameter) e.next();
-        // pw.out.print(p.getType().getCname() + " " + p.getName());
+        Param p;
+        Iterator e = v.iterator();
+        int size = v.size();
+        
+        while(e.hasNext()){
+            p = (Param) e.next();
+            pw.out.print(p.getType().getCname() + " " + p.getName());
 
-        // if(--size > 0)
-        // pw.out.print(", ");
-        // }
+            if(--size > 0)
+                pw.out.print(", ");
+        }
     }
 
 }
