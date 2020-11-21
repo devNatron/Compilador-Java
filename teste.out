@@ -1,21 +1,3 @@
 
-teste.in:16:expressão não é do tipo booleana
-  while i = 10 do
-
-teste.in:16:do esperado
-  while i = 10 do
-
-teste.in:16:statement inválido
-  while i = 10 do
-
-teste.in:16:"endw" esperado
-  while i = 10 do
-
-teste.in:18:} esperado
-    i = i + 1;
-
-teste.in:18:def esperado
-    i = i + 1;
-
-teste.in:18:EOF esperado
-    i = i + 1;
+teste.in:2:Retorno é diferente do tipo de retorno da função
+return true;

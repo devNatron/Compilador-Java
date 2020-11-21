@@ -1,0 +1,19 @@
+def main {
+  var int x;
+  var int y;
+  var int z;
+  var int           res;
+
+  r = x + y - z + b + c - a;//uso de variavel nao declarada
+
+  if res >= 0 then
+    print ("Positivo");
+  endif
+
+  var int i;
+  i = 0;
+
+  while i < 10 do
+    i = i + 1;
+  endw
+}

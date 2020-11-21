@@ -10,6 +10,8 @@ def somaP (int a, int b): int{
     a = somaD (a,b);
     x = x + 1;
   endw
+
+  return x;
 }
 
 def main{

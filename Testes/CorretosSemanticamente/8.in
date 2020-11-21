@@ -25,7 +25,7 @@ def aninhamento(int k, int l):int{
   while i <= k do
     alternaLogico = true;
     while j >= l do
-      if a == alternaLogico then
+      if alternaLogico then
         b = b / 2;
         final = final + 1;
 

@@ -1,0 +1,1 @@
+def main {    return 0;    }//a main nao pode ter retorno

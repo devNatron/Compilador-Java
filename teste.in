@@ -1,19 +1,7 @@
-def main {
-  var int x;
-  var int y;
-  var int z;
-  var int res;
+def soma:int{
+return true;
+}
 
-  res = x + y - z;
-
-  if res <= 0 then
-    print ("Positivo");
-  endif
-
-  var int i;
-  i = 0;
-
-  while i = 10 do
-    i = i + 1;
-  endw
+def main{
+soma();
 }

@@ -17,11 +17,12 @@ public class Compiler {
     private Lexer lexer;
     private SymbolTable symbolTable;
     private CompilerError error;
-    private boolean mainDefinida;
     private Func currentFunction;
+    private int returnsFunc; 
 
     public Program compile(char m_input[], PrintWriter PW, String fileName) {
         symbolTable = new SymbolTable();
+        returnsFunc = 0;
         error = new CompilerError( lexer, new PrintWriter(PW), fileName);
         lexer = new Lexer(m_input, error);
         error.setLexer(lexer);
@@ -151,7 +152,12 @@ public class Compiler {
         }else
             error.show("def esperado");
         
+        if(f != null)
+            if(f.getReturnType() != null && returnsFunc == 0)
+                error.show("falta de retorno na declaração da função");
+            
         symbolTable.removeLocalIdent();
+        returnsFunc = 0;
         return f;
     }
     
@@ -190,6 +196,9 @@ public class Compiler {
     }
     
     private boolean checkBoolean(Type left, Type right){
+        if(left == null || right == null)
+            return false;
+        
         if("undefined".equals(left.getName()) || "undefined".equals(right.getName()))
             return true;
         else
@@ -234,6 +243,9 @@ public class Compiler {
     }
     
     private boolean checkMathExpr(Type left, Type right){
+        if(left == null || right == null)
+            return false;
+        
         boolean orLeft = "int".equals(left.getName()) || "undefined".equals(left.getName());
         
         boolean orRight = "int".equals(right.getName()) || "undefined".equals(right.getName());
@@ -431,9 +443,9 @@ public class Compiler {
             lexer.nextToken();
             right = expr();
             
-            if (!checkAssign(left.getType(), right.getType()))
-                error.show("tipos das expressões são diferentes: " + left.getType().getName() + " e " + right.getType().getName());
-                
+            if (!checkAssign(left.getType(), right.getType())){
+                error.show("conflito de tipos na atribuição");
+            }
         }
         
         if (lexer.token != Symbol.SEMICOLON){
@@ -495,7 +507,10 @@ public class Compiler {
     }
     
     private boolean checkWhileExpr(Type t){
-        return "undefined".equals(t.getName()) || "boolean".equals(t.getName());
+        if(t == null)
+            return false;
+        else
+            return "undefined".equals(t.getName()) || "boolean".equals(t.getName());
     }
 
     //ReturnStat ::= "return" Expr ";"
@@ -508,6 +523,8 @@ public class Compiler {
         }else if (!checkAssign(currentFunction.getReturnType(), e.getType()))
             error.show("Retorno é diferente do tipo de retorno da função");
         
+        returnsFunc++;
+        
         if (lexer.token != Symbol.SEMICOLON)
             error.show("; esperado");
         
@@ -517,7 +534,13 @@ public class Compiler {
     }
     
     private boolean checkAssign(Type left, Type right){
-        return left.getName().equals(right.getName()) || "undefined".equals(left.getName()) || "undefined".equals(right.getName());
+        if((left == null && right != null) || (left != null && right == null))
+            return false;
+        
+        if("undefined".equals(left.getName()) || "undefined".equals(right.getName()))
+            return true;
+        else
+            return left.getName().equals(right.getName());
     }
 
     //VarDecStat ::= "var" Type Id ";"

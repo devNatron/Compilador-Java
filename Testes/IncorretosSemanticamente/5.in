@@ -1,0 +1,12 @@
+def main{
+
+var String s;
+var int x;
+var String texto;
+var boolean logico;
+
+logico = true;
+logico = false;
+
+        x = "nao pode ser assim, pois x eh int";
+}

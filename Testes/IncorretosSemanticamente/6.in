@@ -1,0 +1,33 @@
+def fatorial(int n): int{
+    //variavel so pela diversao
+  var boolean lessThanZero;
+
+    //n <= 0, so pela diversao
+  lessThanZero = n < 0 || n == 0;
+  if lessThanZero
+  then
+    return 1;
+  else
+    return n*fatorial(n-1);
+  endif
+}
+
+def imprima(int before, int valor, String after){
+  var int i;
+  i = 0;
+  while i < before do
+    print("*");
+    i = i + 1;
+  endw
+
+  println("");
+  println(valor);
+  println(after);
+}
+
+def main{
+  var String erro;
+  erro = "vou passar isso como parametro";
+
+  imprima(50, fatorial(erro)*2*fatorial(erro + 2), "    fim");//fatorial espera um parametro int, mas ta recebendo string
+}

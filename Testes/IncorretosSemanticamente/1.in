@@ -20,7 +20,7 @@ def main{
   Result42 = soma(num1, num2);
   println(Result42);
 
-  //Correto sintaticamente, incorreto semantico apenas
+  //chama funcao que nao existe
   print("Subtracao: ");
   Result42 = sub(2, 3);
   println(Result42);

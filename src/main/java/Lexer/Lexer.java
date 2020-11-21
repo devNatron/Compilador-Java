@@ -157,6 +157,25 @@ public class Lexer {
             nextToken();
             return;
         }
+
+        if(input[tokenPos] == '/' && input[tokenPos+1] == '*'){
+            tokenPos += 2;
+            while(tokenPos < input.length && input[tokenPos] != '*' && input[tokenPos+1] != '/'){
+                if(input[tokenPos] == '\n')
+                    lineNumber++;
+                tokenPos++;
+            }
+
+            if(tokenPos == input.length){
+                token = Symbol.EOF;
+                return;
+            }else
+                tokenPos += 2;
+            
+            lineNumber++;
+            nextToken();
+            return;
+        }        
         
         String buffer = "";
 
