@@ -1,0 +1,32 @@
+def logicoOr{
+  var boolean op;
+  var boolean opD;
+
+  op = true;
+  opD = true;
+
+  if op || opD then
+    println ("Verdadeiro");
+  else
+    println("Falso");
+  endif
+}
+
+def logicoE{
+    var boolean op;
+    var boolean opD;
+
+    op = true;
+    opD = true;
+
+    if op && opD then
+      println ("Verdadeiro");
+    else
+      println("Falso");
+    endif
+}
+
+def main{
+  logicoOr();
+  logicoE();
+}

@@ -1,0 +1,11 @@
+def main{
+
+var String s;
+var int x;
+var String texto;
+var boolean logico;
+
+logico = true;
+logico = false;
+
+}

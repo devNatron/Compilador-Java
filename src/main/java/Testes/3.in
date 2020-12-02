@@ -1,0 +1,14 @@
+def soma (int a, int b){
+
+  var int res;
+
+  res = a + b;
+
+  print(res);
+}
+
+def main{
+
+  soma(33, 45);
+}
+
