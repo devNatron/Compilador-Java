@@ -318,7 +318,8 @@ public class Compiler {
         }else if(lexer.token.equals(Symbol.LITERALSTRING)){
             e = new ExprLiteral(new StringType(), lexer.stringValue);
         }else if (lexer.token.equals(Symbol.LITERALBOOLEAN) || lexer.token.equals(Symbol.TRUE) || lexer.token.equals(Symbol.FALSE)){
-            e = new ExprLiteral(new BooleanType(), lexer.stringValue);
+            String literal = lexer.token.equals(Symbol.TRUE) ? "1" : "0";
+            e = new ExprLiteral(new BooleanType(), literal);
         }else{
             error.show("literal não identificado");
             e = new ExprLiteral(new UndefinedType(), lexer.stringValue);

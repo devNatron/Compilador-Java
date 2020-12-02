@@ -15,6 +15,24 @@ public class AssignExprStat extends Stat {
     }
 
     public void genC(PW pw) {
+
+        if(exprRight instanceof FuncCall){
+            FuncCall fc = (FuncCall) exprRight;
+            String functionName = fc.function.getName();
+            
+            if(functionName.equals("readInt")){
+                pw.out.print( "scanf(\"%d\", &");
+                exprLeft.genC(pw);
+                pw.out.println( ");");
+                return;
+            }else if(functionName.equals("readString")){
+                pw.out.print( "scanf(\"%s\", " );
+                exprLeft.genC(pw);
+                pw.out.println( ");");
+                return;
+            }
+        }
+        
         exprLeft.genC(pw);
         if (exprRight != null){
             pw.out.print(" = ");

@@ -21,6 +21,10 @@ public class ExprList {
         v.add(expr);
     }
     
+    public ArrayList<Expr> getList(){
+        return v;
+    }
+    
     public void genC( PW pw ) {
         
         int size = v.size();

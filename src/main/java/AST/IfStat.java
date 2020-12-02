@@ -30,7 +30,7 @@ public class IfStat extends Stat {
             pw.out.println("\t}");
         }
         if ( elsePart != null ) {
-            pw.out.println("else {");
+            pw.out.println("\telse {");
             pw.add();
             elsePart.genC(pw);
             pw.sub();
