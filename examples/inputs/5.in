@@ -1,0 +1,22 @@
+def main {
+  var int x;
+  var int y;
+  var int answer;
+
+  answer = x + y;
+
+  if answer >= 0 then
+    print ("Positive");
+  endif
+
+  var int i;
+  i = 0;
+
+  while i < 10 do
+    i = i + 1;
+  endw
+
+  answer = i - answer;
+
+  print(answer);
+}

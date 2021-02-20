@@ -1,0 +1,6 @@
+
+teste.in:28:função usada ainda não declarada
+  result = soma(number, number);
+
+teste.in:28:) faltando
+  result = soma(number, number);
