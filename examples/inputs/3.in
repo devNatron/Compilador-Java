@@ -1,0 +1,32 @@
+def Or{
+  var boolean op;
+  var boolean opD;
+
+  op = true;
+  opD = true;
+
+  if op || opD then
+    println ("True");
+  else
+    println("False");
+  endif
+}
+
+def And{
+    var boolean op;
+    var boolean opD;
+
+    op = true;
+    opD = true;
+
+    if op && opD then
+      println ("True");
+    else
+      println("False");
+    endif
+}
+
+def main{
+  Or();
+  And();
+}

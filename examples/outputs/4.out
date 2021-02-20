@@ -1,0 +1,18 @@
+#include <stdio.h>
+
+int secondAdd(int c, int d){
+	return c + d;
+}
+int firstAdd(int a, int b){
+	int x;
+	x = 1;
+	while ( x != 4 ){
+		a = secondAdd(a, b);
+	x = x + 1;
+	}
+
+	return x;
+}
+void main(){
+	printf("%d\r\n", firstAdd(10, 20));
+}

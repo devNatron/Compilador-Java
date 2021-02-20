@@ -1,0 +1,35 @@
+def add(int a, int b):int{
+
+  var int res;
+
+  res = a + b;
+
+  return res;
+}
+
+def sub(int a, int b):int{
+
+ var int res;
+
+ res = a - b;
+
+ return res;
+
+}
+
+def main{
+  var int number;
+
+  number = readInt();
+
+  var int result;
+
+  print("Add: ");
+  result = soma(number, number);
+  println(result);
+
+  print("Sub and Add: ");
+  result = add(sub(result, 0), sub(result, number));
+  println(result);
+
+}

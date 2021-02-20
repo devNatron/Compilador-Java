@@ -1,0 +1,19 @@
+def sub (int a, int b):int{
+  return a - b;
+}
+
+
+def add (int a, int b){
+
+  var int res;
+
+  res = a + sub(a, b);
+
+  print(res);
+}
+
+
+def main{
+  add(107, 455);
+}
+

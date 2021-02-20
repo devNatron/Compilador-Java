@@ -1,0 +1,13 @@
+#include <stdio.h>
+
+int sub(int a, int b){
+	return a - b;
+}
+void add(int a, int b){
+	int res;
+	res = a + sub(a, b);
+	printf("%d", res);
+}
+void main(){
+	add(107, 455);
+}

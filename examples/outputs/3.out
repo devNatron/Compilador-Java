@@ -1,0 +1,30 @@
+#include <stdio.h>
+
+void Or(){
+	int op;
+	int opD;
+	op = 1;
+	opD = 1;
+	if ( op || opD ) { 
+		printf("%s\r\n", "True");
+	}
+	else {
+	printf("%s\r\n", "False");
+	}
+}
+void And(){
+	int op;
+	int opD;
+	op = 1;
+	opD = 1;
+	if ( op && opD ) { 
+		printf("%s\r\n", "True");
+	}
+	else {
+	printf("%s\r\n", "False");
+	}
+}
+void main(){
+	Or();
+	And();
+}
