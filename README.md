@@ -1,6 +1,4 @@
-<p align="center">
-  <h3 align="center">Projeto final - Compiladores</h3>
-</p>
+# Projeto final - Compiladores
 
 ## Sobre este pojeto
 
